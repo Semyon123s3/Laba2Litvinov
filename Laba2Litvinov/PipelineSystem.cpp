@@ -358,6 +358,7 @@ void PipelineSystem::showMenu() {
     cout << "7. Удалить КС" << endl;
     cout << "8. Поиск труб" << endl;
     cout << "9. Поиск КС" << endl;
+    cout << "10. Пакетное редактирование труб" << endl;
     cout << "0. Выход" << endl;
     cout << "Выберите действие: ";
 }
@@ -402,6 +403,9 @@ void PipelineSystem::run() {
         case 9:
             searchCS();
             break;
+        case 10:
+            batchEditPipes();
+            break;
         case 0:
             cout << "Выход из программы." << endl;
             return;
@@ -411,5 +415,78 @@ void PipelineSystem::run() {
 
         cout << "\nНажмите Enter для продолжения...";
         cin.get();
+    }
+}
+
+void PipelineSystem::batchEditPipes() {
+    cout << "\n=== ПАКЕТНОЕ РЕДАКТИРОВАНИЕ ТРУБ ===" << endl;
+
+    if (pipes.empty()) {
+        cout << "Нет доступных труб для редактирования." << endl;
+        return;
+    }
+
+    vector<Pipe*> pipesToEdit;
+
+    cout << "Выберите трубы для редактирования:" << endl;
+    searchPipes();  
+
+    string input;
+    cout << "Введите ID труб через пробел для редактирования (или 'all' для всех найденных): ";
+    getline(cin, input);
+
+    if (input == "all") {
+        for (auto& pipe : pipes) {
+            pipesToEdit.push_back(&pipe);
+        }
+    }
+    else {
+        stringstream ss(input);
+        int id;
+        while (ss >> id) {
+            Pipe* pipe = findPipeById(id);
+            if (pipe) {
+                pipesToEdit.push_back(pipe);
+            }
+        }
+    }
+
+    if (pipesToEdit.empty()) {
+        cout << "Не выбрано ни одной трубы для редактирования." << endl;
+        return;
+    }
+
+    cout << "\nВыбрано труб для редактирования: " << pipesToEdit.size() << endl;
+
+    cout << "\nВыберите действие:" << endl;
+    cout << "1. Изменить статус ремонта" << endl;
+    cout << "2. Удалить выбранные трубы" << endl;
+    cout << "0. Отмена" << endl;
+
+    int action = inputInt("Ваш выбор: ", 0, 2);
+
+    switch (action) {
+    case 1: {
+        bool newStatus = inputInt("Новый статус (1-в ремонте, 0-работает): ", 0, 1) == 1;
+        for (auto pipe : pipesToEdit) {
+            pipe->setRepairStatus(newStatus);
+        }
+        logger.log("Пакетное изменение статуса труб: " + to_string(pipesToEdit.size()) + " объектов");
+        cout << "Статус " << pipesToEdit.size() << " труб изменен!" << endl;
+        break;
+    }
+    case 2: {
+        for (auto pipe : pipesToEdit) {
+            pipes.erase(remove_if(pipes.begin(), pipes.end(),
+                [pipe](const Pipe& p) { return p.getId() == pipe->getId(); }),
+                pipes.end());
+        }
+        logger.log("Пакетное удаление труб: " + to_string(pipesToEdit.size()) + " объектов");
+        cout << "Удалено " << pipesToEdit.size() << " труб!" << endl;
+        break;
+    }
+    case 0:
+        cout << "Операция отменена." << endl;
+        break;
     }
 }

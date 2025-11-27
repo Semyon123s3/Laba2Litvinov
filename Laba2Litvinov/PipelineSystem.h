@@ -39,4 +39,5 @@ public:
     void deleteCS();
     void searchPipes();
     void searchCS();
+    void batchEditPipes();
 };

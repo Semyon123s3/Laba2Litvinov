@@ -242,6 +242,111 @@ void PipelineSystem::deleteCS() {
     }
 }
 
+void PipelineSystem::searchPipes() {
+    cout << "\n=== ПОИСК ТРУБ ===" << endl;
+    cout << "1. По названию" << endl;
+    cout << "2. По признаку 'в ремонте'" << endl;
+    cout << "3. Все трубы" << endl;
+
+    int choice = inputInt("Выберите критерий поиска: ", 1, 3);
+    vector<Pipe*> foundPipes;
+
+    switch (choice) {
+    case 1: {
+        string name = inputString("Введите название для поиска: ");
+        for (auto& pipe : pipes) {
+            if (pipe.getName().find(name) != string::npos) {
+                foundPipes.push_back(&pipe);
+            }
+        }
+        break;
+    }
+    case 2: {
+        bool status = inputInt("В ремонте (1-да, 0-нет): ", 0, 1) == 1;
+        for (auto& pipe : pipes) {
+            if (pipe.isInRepair() == status) {
+                foundPipes.push_back(&pipe);
+            }
+        }
+        break;
+    }
+    case 3:
+        for (auto& pipe : pipes) {
+            foundPipes.push_back(&pipe);
+        }
+        break;
+    }
+
+    showPipesList(foundPipes);
+    logger.log("Поиск труб: найдено " + to_string(foundPipes.size()) + " объектов");
+}
+
+void PipelineSystem::searchCS() {
+    cout << "\n=== ПОИСК КС ===" << endl;
+    cout << "1. По названию" << endl;
+    cout << "2. По проценту незадействованных цехов" << endl;
+    cout << "3. Все КС" << endl;
+
+    int choice = inputInt("Выберите критерий поиска: ", 1, 3);
+    vector<CS*> foundCS;
+
+    switch (choice) {
+    case 1: {
+        string name = inputString("Введите название для поиска: ");
+        for (auto& cs : stations) {
+            if (cs.getName().find(name) != string::npos) {
+                foundCS.push_back(&cs);
+            }
+        }
+        break;
+    }
+    case 2: {
+        double minPercent = inputDouble("Минимальный процент незадействованных цехов: ", 0, 100);
+        double maxPercent = inputDouble("Максимальный процент незадействованных цехов: ", minPercent, 100);
+
+        for (auto& cs : stations) {
+            double percent = cs.getUnusedPercentage();
+            if (percent >= minPercent && percent <= maxPercent) {
+                foundCS.push_back(&cs);
+            }
+        }
+        break;
+    }
+    case 3:
+        for (auto& cs : stations) {
+            foundCS.push_back(&cs);
+        }
+        break;
+    }
+
+    showCSList(foundCS);
+    logger.log("Поиск КС: найдено " + to_string(foundCS.size()) + " объектов");
+}
+
+void PipelineSystem::showPipesList(const vector<Pipe*>& pipeList) {
+    cout << "\n--- НАЙДЕННЫЕ ТРУБЫ (" << pipeList.size() << ") ---" << endl;
+    if (pipeList.empty()) {
+        cout << "Трубы не найдены." << endl;
+    }
+    else {
+        for (const auto& pipe : pipeList) {
+            pipe->display();
+        }
+    }
+}
+
+void PipelineSystem::showCSList(const vector<CS*>& csList) {
+    cout << "\n--- НАЙДЕННЫЕ КС (" << csList.size() << ") ---" << endl;
+    if (csList.empty()) {
+        cout << "КС не найдены." << endl;
+    }
+    else {
+        for (const auto& cs : csList) {
+            cs->display();
+        }
+    }
+}
+
 void PipelineSystem::showMenu() {
     cout << "\n=== СИСТЕМА УПРАВЛЕНИЯ ТРУБОПРОВОДОМ ===" << endl;
     cout << "1. Добавить трубу" << endl;
@@ -251,6 +356,8 @@ void PipelineSystem::showMenu() {
     cout << "5. Редактировать КС" << endl;
     cout << "6. Удалить трубу" << endl;
     cout << "7. Удалить КС" << endl;
+    cout << "8. Поиск труб" << endl;
+    cout << "9. Поиск КС" << endl;
     cout << "0. Выход" << endl;
     cout << "Выберите действие: ";
 }
@@ -288,6 +395,12 @@ void PipelineSystem::run() {
             break;
         case 7:
             deleteCS();
+            break;
+        case 8:
+            searchPipes();
+            break;
+        case 9:
+            searchCS();
             break;
         case 0:
             cout << "Выход из программы." << endl;

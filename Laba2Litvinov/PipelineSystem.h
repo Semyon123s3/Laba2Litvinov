@@ -22,6 +22,8 @@ private:
     CS* findCSById(int id);
     void showAllPipes();
     void showAllCS();
+    void showPipesList(const vector<Pipe*>& pipeList);
+    void showCSList(const vector<CS*>& csList);
 
 public:
     PipelineSystem();
@@ -35,4 +37,6 @@ public:
     void editCS();
     void deletePipe();
     void deleteCS();
+    void searchPipes();
+    void searchCS();
 };

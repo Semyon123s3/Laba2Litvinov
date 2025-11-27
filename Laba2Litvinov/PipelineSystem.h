@@ -40,4 +40,6 @@ public:
     void searchPipes();
     void searchCS();
     void batchEditPipes();
+    void saveToFile();
+    void loadFromFile();
 };

@@ -2,6 +2,8 @@
 #include <iostream>
 #include <limits>
 #include <algorithm>
+#include <sstream>
+#include <vector>
 using namespace std;
 
 PipelineSystem::PipelineSystem() : nextPipeId(1), nextCSId(1) {}
@@ -359,6 +361,8 @@ void PipelineSystem::showMenu() {
     cout << "8. Поиск труб" << endl;
     cout << "9. Поиск КС" << endl;
     cout << "10. Пакетное редактирование труб" << endl;
+    cout << "11. Сохранить в файл" << endl;
+    cout << "12. Загрузить из файла" << endl;
     cout << "0. Выход" << endl;
     cout << "Выберите действие: ";
 }
@@ -405,6 +409,12 @@ void PipelineSystem::run() {
             break;
         case 10:
             batchEditPipes();
+            break;
+        case 11:
+            saveToFile();
+            break;
+        case 12:
+            loadFromFile();
             break;
         case 0:
             cout << "Выход из программы." << endl;
@@ -488,5 +498,133 @@ void PipelineSystem::batchEditPipes() {
     case 0:
         cout << "Операция отменена." << endl;
         break;
+    }
+}
+
+void PipelineSystem::saveToFile() {
+    string filename = inputString("Введите имя файла для сохранения: ");
+    ofstream file(filename);
+
+    if (!file.is_open()) {
+        cout << "Ошибка создания файла!" << endl;
+        return;
+    }
+
+    file << pipes.size() << endl;
+    for (const auto& pipe : pipes) {
+        file << pipe.getId() << endl;
+        file << pipe.getName() << endl;
+        file << pipe.getLength() << endl;
+        file << pipe.getDiameter() << endl;
+        file << pipe.isInRepair() << endl;
+    }
+
+    file << stations.size() << endl;
+    for (const auto& cs : stations) {
+        file << cs.getId() << endl;
+        file << cs.getName() << endl;
+        file << cs.getTotalWorkshops() << endl;
+        file << cs.getWorkingWorkshops() << endl;
+        file << cs.getEfficiencyClass() << endl;
+    }
+
+    file.close();
+    logger.log("Сохранение данных в файл: " + filename);
+    cout << "Данные сохранены в файл: " << filename << endl;
+}
+
+void PipelineSystem::loadFromFile() {
+    string filename = inputString("Введите имя файла для загрузки: ");
+    ifstream file(filename);
+
+    if (!file.is_open()) {
+        cout << "Ошибка открытия файла!" << endl;
+        return;
+    }
+
+    vector<Pipe> backupPipes = pipes;
+    vector<CS> backupStations = stations;
+    int backupNextPipeId = nextPipeId;
+    int backupNextCSId = nextCSId;
+
+    try {
+        pipes.clear();
+        stations.clear();
+
+        int pipeCount;
+        file >> pipeCount;
+        file.ignore();
+
+        for (int i = 0; i < pipeCount; i++) {
+            Pipe pipe(0);
+            int id;
+            string name;
+            double length;
+            int diameter;
+            bool inRepair;
+
+            file >> id;
+            file.ignore();
+            getline(file, name);
+            file >> length;
+            file >> diameter;
+            file >> inRepair;
+            file.ignore();
+
+            pipe = Pipe(id);
+            pipe.setName(name);
+            pipe.setLength(length);
+            pipe.setDiameter(diameter);
+            pipe.setRepairStatus(inRepair);
+
+            pipes.push_back(pipe);
+            if (id >= nextPipeId) {
+                nextPipeId = id + 1;
+            }
+        }
+
+        int csCount;
+        file >> csCount;
+        file.ignore();
+
+        for (int i = 0; i < csCount; i++) {
+            CS cs(0);
+            int id;
+            string name;
+            int totalWorkshops;
+            int workingWorkshops;
+            string efficiencyClass;
+
+            file >> id;
+            file.ignore();
+            getline(file, name);
+            file >> totalWorkshops;
+            file >> workingWorkshops;
+            file.ignore();
+            getline(file, efficiencyClass);
+
+            cs = CS(id);
+            cs.setName(name);
+            cs.setTotalWorkshops(totalWorkshops);
+            cs.setWorkingWorkshops(workingWorkshops);
+            cs.setEfficiencyClass(efficiencyClass);
+
+            stations.push_back(cs);
+            if (id >= nextCSId) {
+                nextCSId = id + 1;
+            }
+        }
+
+        file.close();
+        logger.log("Загрузка данных из файла: " + filename);
+        cout << "Данные загружены из файла: " << filename << endl;
+
+    }
+    catch (...) {
+        pipes = backupPipes;
+        stations = backupStations;
+        nextPipeId = backupNextPipeId;
+        nextCSId = backupNextCSId;
+        cout << "Ошибка загрузки файла! Данные восстановлены." << endl;
     }
 }

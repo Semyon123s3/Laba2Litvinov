@@ -18,6 +18,11 @@ private:
     int inputInt(const string& prompt, int min, int max);
     double inputDouble(const string& prompt, double min, double max);
 
+    Pipe* findPipeById(int id);
+    CS* findCSById(int id);
+    void showAllPipes();
+    void showAllCS();
+
 public:
     PipelineSystem();
     void showMenu();
@@ -26,4 +31,8 @@ public:
     void addPipe();
     void addCS();
     void showAllObjects();
+    void editPipe();
+    void editCS();
+    void deletePipe();
+    void deleteCS();
 };

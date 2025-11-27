@@ -164,12 +164,26 @@ void PipelineSystem::editPipe() {
     }
 
     cout << "\nРедактирование трубы ID: " << pipe->getId() << endl;
-    pipe->setName(inputString("Новое название: "));
-    pipe->setLength(inputDouble("Новая длина (км): ", 0.1, 10000.0));
-    pipe->setDiameter(inputInt("Новый диаметр (мм): ", 1, 5000));
 
-    int repairStatus = inputInt("В ремонте (1-да, 0-нет): ", 0, 1);
-    pipe->setRepairStatus(repairStatus == 1);
+    cout << "Выберите что редактировать:" << endl;
+    cout << "1. Основные параметры" << endl;
+    cout << "2. Переключить статус ремонта" << endl;
+
+    int editType = inputInt("Ваш выбор: ", 1, 2);
+
+    if (editType == 1) {
+        pipe->setName(inputString("Новое название: "));
+        pipe->setLength(inputDouble("Новая длина (км): ", 0.1, 10000.0));
+        pipe->setDiameter(inputInt("Новый диаметр (мм): ", 1, 5000));
+
+        int repairStatus = inputInt("В ремонте (1-да, 0-нет): ", 0, 1);
+        pipe->setRepairStatus(repairStatus == 1);
+    }
+    else {
+        pipe->toggleRepair();
+        cout << "Статус ремонта изменен. Теперь: "
+            << (pipe->isInRepair() ? "в ремонте" : "не в ремонте") << endl;
+    }
 
     logger.log("Отредактирована труба ID: " + to_string(pipe->getId()));
     cout << "Труба успешно отредактирована!" << endl;
@@ -191,10 +205,51 @@ void PipelineSystem::editCS() {
     }
 
     cout << "\nРедактирование КС ID: " << cs->getId() << endl;
-    cs->setName(inputString("Новое название: "));
-    cs->setTotalWorkshops(inputInt("Общее количество цехов: ", 1, 1000));
-    cs->setWorkingWorkshops(inputInt("Количество работающих цехов: ", 0, cs->getTotalWorkshops()));
-    cs->setEfficiencyClass(inputString("Класс эффективности: "));
+
+    cout << "Выберите что редактировать:" << endl;
+    cout << "1. Основные параметры" << endl;
+    cout << "2. Управление цехами" << endl;
+
+    int editType = inputInt("Ваш выбор: ", 1, 2);
+
+    if (editType == 1) {
+        cs->setName(inputString("Новое название: "));
+        cs->setTotalWorkshops(inputInt("Общее количество цехов: ", 1, 1000));
+        cs->setWorkingWorkshops(inputInt("Количество работающих цехов: ", 0, cs->getTotalWorkshops()));
+        cs->setEfficiencyClass(inputString("Класс эффективности: "));
+    }
+    else {
+        cout << "\nТекущее состояние: " << cs->getWorkingWorkshops() << " из " << cs->getTotalWorkshops() << " цехов работают" << endl;
+        cout << "1. Запустить цех" << endl;
+        cout << "2. Остановить цех" << endl;
+        cout << "0. Отмена" << endl;
+
+        int action = inputInt("Выберите действие: ", 0, 2);
+
+        switch (action) {
+        case 1:
+            if (cs->startWorkshop()) {
+                cout << "Цех запущен! Теперь работает " << cs->getWorkingWorkshops()
+                    << " из " << cs->getTotalWorkshops() << " цехов." << endl;
+            }
+            else {
+                cout << "Ошибка: Все цехи уже работают!" << endl;
+            }
+            break;
+        case 2:
+            if (cs->stopWorkshop()) {
+                cout << "Цех остановлен! Теперь работает " << cs->getWorkingWorkshops()
+                    << " из " << cs->getTotalWorkshops() << " цехов." << endl;
+            }
+            else {
+                cout << "Ошибка: Нет работающих цехов!" << endl;
+            }
+            break;
+        case 0:
+            cout << "Операция отменена." << endl;
+            break;
+        }
+    }
 
     logger.log("Отредактирована КС ID: " + to_string(cs->getId()));
     cout << "КС успешно отредактирована!" << endl;
@@ -429,6 +484,10 @@ void PipelineSystem::run() {
 }
 
 void PipelineSystem::batchEditPipes() {
+    if (pipes.empty()) {
+        cout << "Нет доступных труб для редактирования." << endl;
+        return;
+    }
     cout << "\n=== ПАКЕТНОЕ РЕДАКТИРОВАНИЕ ТРУБ ===" << endl;
 
     if (pipes.empty()) {

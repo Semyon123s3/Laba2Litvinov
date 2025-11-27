@@ -22,4 +22,8 @@ public:
     PipelineSystem();
     void showMenu();
     void run();
+
+    void addPipe();
+    void addCS();
+    void showAllObjects();
 };

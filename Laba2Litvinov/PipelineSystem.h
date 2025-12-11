@@ -2,14 +2,14 @@
 #include "Pipe.h"
 #include "CS.h"
 #include "Logger.h"
-#include <vector>
+#include <unordered_map>
 #include <string>
 using namespace std;
 
 class PipelineSystem {
 private:
-    vector<Pipe> pipes;
-    vector<CS> stations;
+    unordered_map<int, Pipe> pipes;
+    unordered_map<int, CS> stations;
     int nextPipeId;
     int nextCSId;
     Logger logger;
@@ -22,8 +22,8 @@ private:
     CS* findCSById(int id);
     void showAllPipes();
     void showAllCS();
-    void showPipesList(const vector<Pipe*>& pipeList);
-    void showCSList(const vector<CS*>& csList);
+    void showPipesList(const unordered_map<int, Pipe*>& pipeMap);
+    void showCSList(const unordered_map<int, CS*>&csMap);
 
 public:
     PipelineSystem();

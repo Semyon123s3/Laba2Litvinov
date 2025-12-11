@@ -2,6 +2,7 @@
 #include "Pipe.h"
 #include "CS.h"
 #include "Logger.h"
+#include "GasNetwork.h"  
 #include <unordered_map>
 #include <string>
 using namespace std;
@@ -14,6 +15,8 @@ private:
     int nextCSId;
     Logger logger;
 
+    GasNetwork* gasNetwork;
+
     string inputString(const string& prompt);
     int inputInt(const string& prompt, int min, int max);
     double inputDouble(const string& prompt, double min, double max);
@@ -23,10 +26,12 @@ private:
     void showAllPipes();
     void showAllCS();
     void showPipesList(const unordered_map<int, Pipe*>& pipeMap);
-    void showCSList(const unordered_map<int, CS*>&csMap);
+    void showCSList(const unordered_map<int, CS*>& csMap);
 
 public:
     PipelineSystem();
+    ~PipelineSystem();   
+
     void showMenu();
     void run();
 
@@ -42,4 +47,9 @@ public:
     void batchEditPipes();
     void saveToFile();
     void loadFromFile();
+
+    void connectObjects();       
+    void disconnectObjects();   
+    void showTopologicalSort();  
+    void showNetwork();          
 };

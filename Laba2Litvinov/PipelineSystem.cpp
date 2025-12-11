@@ -298,35 +298,35 @@ void PipelineSystem::searchPipes() {
     cout << "3. Все трубы" << endl;
 
     int choice = inputInt("Выберите критерий поиска: ", 1, 3);
-    vector<Pipe*> foundPipes;
+    unordered_map<int, Pipe*> foundPipes;   
 
     switch (choice) {
     case 1: {
         string name = inputString("Введите название для поиска: ");
-        for (auto& pipe : pipes) {
-            if (pipe.getName().find(name) != string::npos) {
-                foundPipes.push_back(&pipe);
+        for (auto& pair : pipes) {   
+            if (pair.second.getName().find(name) != string::npos) {
+                foundPipes[pair.first] = &pair.second;   
             }
         }
         break;
     }
     case 2: {
         bool status = inputInt("В ремонте (1-да, 0-нет): ", 0, 1) == 1;
-        for (auto& pipe : pipes) {
-            if (pipe.isInRepair() == status) {
-                foundPipes.push_back(&pipe);
+        for (auto& pair : pipes) {
+            if (pair.second.isInRepair() == status) {
+                foundPipes[pair.first] = &pair.second;
             }
         }
         break;
     }
     case 3:
-        for (auto& pipe : pipes) {
-            foundPipes.push_back(&pipe);
+        for (auto& pair : pipes) {
+            foundPipes[pair.first] = &pair.second;
         }
         break;
     }
 
-    showPipesList(foundPipes);
+    showPipesList(foundPipes);   
     logger.log("Поиск труб: найдено " + to_string(foundPipes.size()) + " объектов");
 }
 
@@ -337,14 +337,14 @@ void PipelineSystem::searchCS() {
     cout << "3. Все КС" << endl;
 
     int choice = inputInt("Выберите критерий поиска: ", 1, 3);
-    vector<CS*> foundCS;
+    unordered_map<int, CS*> foundCS;   
 
     switch (choice) {
     case 1: {
         string name = inputString("Введите название для поиска: ");
-        for (auto& cs : stations) {
-            if (cs.getName().find(name) != string::npos) {
-                foundCS.push_back(&cs);
+        for (auto& pair : stations) {
+            if (pair.second.getName().find(name) != string::npos) {
+                foundCS[pair.first] = &pair.second;
             }
         }
         break;
@@ -353,45 +353,45 @@ void PipelineSystem::searchCS() {
         double minPercent = inputDouble("Минимальный процент незадействованных цехов: ", 0, 100);
         double maxPercent = inputDouble("Максимальный процент незадействованных цехов: ", minPercent, 100);
 
-        for (auto& cs : stations) {
-            double percent = cs.getUnusedPercentage();
+        for (auto& pair : stations) {
+            double percent = pair.second.getUnusedPercentage();
             if (percent >= minPercent && percent <= maxPercent) {
-                foundCS.push_back(&cs);
+                foundCS[pair.first] = &pair.second;
             }
         }
         break;
     }
     case 3:
-        for (auto& cs : stations) {
-            foundCS.push_back(&cs);
+        for (auto& pair : stations) {
+            foundCS[pair.first] = &pair.second;
         }
         break;
     }
 
-    showCSList(foundCS);
+    showCSList(foundCS);  
     logger.log("Поиск КС: найдено " + to_string(foundCS.size()) + " объектов");
 }
 
-void PipelineSystem::showPipesList(const vector<Pipe*>& pipeList) {
-    cout << "\n--- НАЙДЕННЫЕ ТРУБЫ (" << pipeList.size() << ") ---" << endl;
-    if (pipeList.empty()) {
+void PipelineSystem::showPipesList(const unordered_map<int, Pipe*>& pipeMap) {
+    cout << "\n--- НАЙДЕННЫЕ ТРУБЫ (" << pipeMap.size() << ") ---" << endl;
+    if (pipeMap.empty()) {
         cout << "Трубы не найдены." << endl;
     }
     else {
-        for (const auto& pipe : pipeList) {
-            pipe->display();
+        for (const auto& pair : pipeMap) {   
+            pair.second->display();
         }
     }
 }
 
-void PipelineSystem::showCSList(const vector<CS*>& csList) {
-    cout << "\n--- НАЙДЕННЫЕ КС (" << csList.size() << ") ---" << endl;
-    if (csList.empty()) {
+void PipelineSystem::showCSList(const unordered_map<int, CS*>& csMap) {
+    cout << "\n--- НАЙДЕННЫЕ КС (" << csMap.size() << ") ---" << endl;
+    if (csMap.empty()) {
         cout << "КС не найдены." << endl;
     }
     else {
-        for (const auto& cs : csList) {
-            cs->display();
+        for (const auto& pair : csMap) {
+            pair.second->display();
         }
     }
 }
@@ -476,10 +476,6 @@ void PipelineSystem::run() {
 }
 
 void PipelineSystem::batchEditPipes() {
-    if (pipes.empty()) {
-        cout << "Нет доступных труб для редактирования." << endl;
-        return;
-    }
     cout << "\n=== ПАКЕТНОЕ РЕДАКТИРОВАНИЕ ТРУБ ===" << endl;
 
     if (pipes.empty()) {
@@ -487,19 +483,18 @@ void PipelineSystem::batchEditPipes() {
         return;
     }
 
-    vector<Pipe*> pipesToEdit;
+    unordered_map<int, Pipe*> foundPipes;
+    cout << "Сначала выполним поиск труб:" << endl;
+    searchPipes();   
 
-    cout << "Выберите трубы для редактирования:" << endl;
-    searchPipes();  
-
+    cout << "\nВведите ID труб через пробел для редактирования (или 'all' для всех найденных): ";
     string input;
-    cout << "Введите ID труб через пробел для редактирования (или 'all' для всех найденных): ";
     getline(cin, input);
 
+    unordered_map<int, Pipe*> pipesToEdit;
+
     if (input == "all") {
-        for (auto& pipe : pipes) {
-            pipesToEdit.push_back(&pipe);
-        }
+        pipesToEdit = foundPipes;
     }
     else {
         stringstream ss(input);
@@ -507,7 +502,7 @@ void PipelineSystem::batchEditPipes() {
         while (ss >> id) {
             Pipe* pipe = findPipeById(id);
             if (pipe) {
-                pipesToEdit.push_back(pipe);
+                pipesToEdit[id] = pipe;   
             }
         }
     }
@@ -529,18 +524,16 @@ void PipelineSystem::batchEditPipes() {
     switch (action) {
     case 1: {
         bool newStatus = inputInt("Новый статус (1-в ремонте, 0-работает): ", 0, 1) == 1;
-        for (auto pipe : pipesToEdit) {
-            pipe->setRepairStatus(newStatus);
+        for (auto& pair : pipesToEdit) {  
+            pair.second->setRepairStatus(newStatus);
         }
         logger.log("Пакетное изменение статуса труб: " + to_string(pipesToEdit.size()) + " объектов");
         cout << "Статус " << pipesToEdit.size() << " труб изменен!" << endl;
         break;
     }
     case 2: {
-        for (auto pipe : pipesToEdit) {
-            pipes.erase(remove_if(pipes.begin(), pipes.end(),
-                [pipe](const Pipe& p) { return p.getId() == pipe->getId(); }),
-                pipes.end());
+        for (auto& pair : pipesToEdit) {
+            pipes.erase(pair.first);   
         }
         logger.log("Пакетное удаление труб: " + to_string(pipesToEdit.size()) + " объектов");
         cout << "Удалено " << pipesToEdit.size() << " труб!" << endl;
@@ -551,7 +544,6 @@ void PipelineSystem::batchEditPipes() {
         break;
     }
 }
-
 void PipelineSystem::saveToFile() {
     string filename = inputString("Введите имя файла для сохранения: ");
     ofstream file(filename);

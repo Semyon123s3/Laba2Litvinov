@@ -652,16 +652,24 @@ void PipelineSystem::saveToFile() {
     }
 
     file << pipes.size() << endl;
-    for (const auto& pipe : pipes) {
+    for (const auto& pair : pipes) {
+        const Pipe& pipe = pair.second;
         file << pipe.getId() << endl;
         file << pipe.getName() << endl;
         file << pipe.getLength() << endl;
         file << pipe.getDiameter() << endl;
         file << pipe.isInRepair() << endl;
+
+        file << pipe.getIsConnected() << endl;
+        if (pipe.getIsConnected()) {
+            file << pipe.getStartStationId() << endl;
+            file << pipe.getEndStationId() << endl;
+        }
     }
 
     file << stations.size() << endl;
-    for (const auto& cs : stations) {
+    for (const auto& pair : stations) {
+        const CS& cs = pair.second;
         file << cs.getId() << endl;
         file << cs.getName() << endl;
         file << cs.getTotalWorkshops() << endl;
@@ -683,8 +691,8 @@ void PipelineSystem::loadFromFile() {
         return;
     }
 
-    vector<Pipe> backupPipes = pipes;
-    vector<CS> backupStations = stations;
+    unordered_map<int, Pipe> backupPipes = pipes;
+    unordered_map<int, CS> backupStations = stations;
     int backupNextPipeId = nextPipeId;
     int backupNextCSId = nextCSId;
 
@@ -697,28 +705,36 @@ void PipelineSystem::loadFromFile() {
         file.ignore();
 
         for (int i = 0; i < pipeCount; i++) {
-            Pipe pipe(0);
             int id;
             string name;
             double length;
             int diameter;
             bool inRepair;
+            bool isConnected; 
+            int startId = -1, endId = -1;
 
             file >> id;
             file.ignore();
             getline(file, name);
-            file >> length;
-            file >> diameter;
-            file >> inRepair;
-            file.ignore();
+            file >> length >> diameter >> inRepair;
 
-            pipe = Pipe(id);
+            file >> isConnected;
+            if (isConnected) {
+                file >> startId >> endId;
+            }
+            file.ignore(); 
+
+            Pipe pipe(id);
             pipe.setName(name);
             pipe.setLength(length);
             pipe.setDiameter(diameter);
             pipe.setRepairStatus(inRepair);
 
-            pipes.push_back(pipe);
+            if (isConnected) {
+                pipe.connect(startId, endId);
+            }
+
+            pipes[id] = pipe;
             if (id >= nextPipeId) {
                 nextPipeId = id + 1;
             }
@@ -729,7 +745,6 @@ void PipelineSystem::loadFromFile() {
         file.ignore();
 
         for (int i = 0; i < csCount; i++) {
-            CS cs(0);
             int id;
             string name;
             int totalWorkshops;
@@ -739,24 +754,27 @@ void PipelineSystem::loadFromFile() {
             file >> id;
             file.ignore();
             getline(file, name);
-            file >> totalWorkshops;
-            file >> workingWorkshops;
+            file >> totalWorkshops >> workingWorkshops;
             file.ignore();
             getline(file, efficiencyClass);
 
-            cs = CS(id);
+            CS cs(id);
             cs.setName(name);
             cs.setTotalWorkshops(totalWorkshops);
             cs.setWorkingWorkshops(workingWorkshops);
             cs.setEfficiencyClass(efficiencyClass);
 
-            stations.push_back(cs);
+            stations[id] = cs;
             if (id >= nextCSId) {
                 nextCSId = id + 1;
             }
         }
 
         file.close();
+
+        delete gasNetwork;
+        gasNetwork = new GasNetwork(pipes, stations);
+
         logger.log("Загрузка данных из файла: " + filename);
         cout << "Данные загружены из файла: " << filename << endl;
 

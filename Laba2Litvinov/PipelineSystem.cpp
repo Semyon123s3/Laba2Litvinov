@@ -4,9 +4,16 @@
 #include <algorithm>
 #include <sstream>
 #include <unordered_map>
+#include "GasNetwork.h"
 using namespace std;
 
-PipelineSystem::PipelineSystem() : nextPipeId(1), nextCSId(1) {}
+PipelineSystem::PipelineSystem() : nextPipeId(1), nextCSId(1) {
+    gasNetwork = new GasNetwork(pipes, stations);   
+}
+
+PipelineSystem::~PipelineSystem() {
+    delete gasNetwork;   
+}
 
 string PipelineSystem::inputString(const string& prompt) {
     string result;
@@ -106,7 +113,6 @@ void PipelineSystem::addPipe() {
     cout << "Труба успешно добавлена! ID: " << newPipe.getId() << endl;
 }
 
-// ИЗМЕНЕНО: аналогично для addCS
 void PipelineSystem::addCS() {
     cout << "\n=== ДОБАВЛЕНИЕ КОМПРЕССОРНОЙ СТАНЦИИ ===" << endl;
 
@@ -410,6 +416,11 @@ void PipelineSystem::showMenu() {
     cout << "10. Пакетное редактирование труб" << endl;
     cout << "11. Сохранить в файл" << endl;
     cout << "12. Загрузить из файла" << endl;
+    cout << "13. Соединить КС в сеть" << endl;
+    cout << "14. Разорвать соединение" << endl;
+    cout << "15. Показать сеть" << endl;
+    cout << "16. Топологическая сортировка" << endl;
+
     cout << "0. Выход" << endl;
     cout << "Выберите действие: ";
 }
@@ -463,6 +474,20 @@ void PipelineSystem::run() {
         case 12:
             loadFromFile();
             break;
+
+        case 13:
+            connectObjects();
+            break;
+        case 14:
+            disconnectObjects();
+            break;
+        case 15:
+            showNetwork();
+            break;
+        case 16:
+            showTopologicalSort();
+            break;
+
         case 0:
             cout << "Выход из программы." << endl;
             return;
@@ -474,6 +499,7 @@ void PipelineSystem::run() {
         cin.get();
     }
 }
+
 
 void PipelineSystem::batchEditPipes() {
     cout << "\n=== ПАКЕТНОЕ РЕДАКТИРОВАНИЕ ТРУБ ===" << endl;
@@ -544,6 +570,78 @@ void PipelineSystem::batchEditPipes() {
         break;
     }
 }
+
+void PipelineSystem::connectObjects() {
+    cout << "\n=== СОЕДИНЕНИЕ КОМПРЕССОРНЫХ СТАНЦИЙ ===" << endl;
+
+    if (stations.size() < 2) {
+        cout << "Для соединения нужно хотя бы 2 КС!" << endl;
+        return;
+    }
+
+    showAllCS();
+
+    int startId, endId, diameter;
+
+    startId = inputInt("Введите ID КС входа: ", 1, nextCSId - 1);
+    endId = inputInt("Введите ID КС выхода: ", 1, nextCSId - 1);
+
+    if (startId == endId) {
+        cout << "Ошибка: нельзя соединить КС саму с собой!" << endl;
+        return;
+    }
+
+    cout << "Допустимые диаметры: 500, 700, 1000, 1400 мм" << endl;
+    diameter = inputInt("Введите диаметр трубы: ", 500, 1400);
+
+    if (gasNetwork->connectStations(startId, endId, diameter)) {
+        cout << "Соединение успешно создано!" << endl;
+        logger.log("Создано соединение: КС" + to_string(startId) + " -> КС" + to_string(endId) +
+            " через трубу диаметром " + to_string(diameter) + " мм");
+    }
+}
+
+void PipelineSystem::disconnectObjects() {
+    cout << "\n=== РАЗРЫВ СОЕДИНЕНИЯ ===" << endl;
+
+    if (pipes.empty()) {
+        cout << "Нет труб." << endl;
+        return;
+    }
+
+    showAllPipes();
+    int pipeId = inputInt("Введите ID трубы для разрыва соединения: ", 1, nextPipeId - 1);
+
+    if (gasNetwork->disconnectPipe(pipeId)) {
+        cout << "Соединение разорвано." << endl;
+        logger.log("Разорвано соединение для трубы ID: " + to_string(pipeId));
+    }
+}
+
+void PipelineSystem::showNetwork() {
+    gasNetwork->showNetwork();
+}
+
+void PipelineSystem::showTopologicalSort() {
+    vector<int> sorted = gasNetwork->topologicalSort();
+
+    if (sorted.empty()) {
+        cout << "Топологическая сортировка невозможна." << endl;
+    }
+    else {
+        cout << "\n=== ТОПОЛОГИЧЕСКАЯ СОРТИРОВКА ===" << endl;
+        cout << "Порядок обработки КС: ";
+        for (size_t i = 0; i < sorted.size(); ++i) {
+            cout << "КС" << sorted[i];
+            if (i < sorted.size() - 1) {
+                cout << " -> ";
+            }
+        }
+        cout << endl;
+        logger.log("Выполнена топологическая сортировка.");
+    }
+}
+
 void PipelineSystem::saveToFile() {
     string filename = inputString("Введите имя файла для сохранения: ");
     ofstream file(filename);

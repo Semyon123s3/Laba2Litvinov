@@ -3,7 +3,7 @@
 #include <limits>
 #include <algorithm>
 #include <sstream>
-#include <vector>
+#include <unordered_map>
 using namespace std;
 
 PipelineSystem::PipelineSystem() : nextPipeId(1), nextCSId(1) {}
@@ -49,19 +49,17 @@ double PipelineSystem::inputDouble(const string& prompt, double min, double max)
 }
 
 Pipe* PipelineSystem::findPipeById(int id) {
-    for (auto& pipe : pipes) {
-        if (pipe.getId() == id) {
-            return &pipe;
-        }
+    auto it = pipes.find(id);          
+    if (it != pipes.end()) {
+        return &(it->second);           
     }
     return nullptr;
 }
 
 CS* PipelineSystem::findCSById(int id) {
-    for (auto& cs : stations) {
-        if (cs.getId() == id) {
-            return &cs;
-        }
+    auto it = stations.find(id);
+    if (it != stations.end()) {
+        return &(it->second);
     }
     return nullptr;
 }
@@ -72,11 +70,12 @@ void PipelineSystem::showAllPipes() {
         cout << "Трубы не добавлены." << endl;
     }
     else {
-        for (const auto& pipe : pipes) {
-            pipe.display();
+        for (const auto& pair : pipes) {   
+            pair.second.display();
         }
     }
 }
+
 
 void PipelineSystem::showAllCS() {
     cout << "\n--- ВСЕ КС ---" << endl;
@@ -84,8 +83,8 @@ void PipelineSystem::showAllCS() {
         cout << "КС не добавлены." << endl;
     }
     else {
-        for (const auto& cs : stations) {
-            cs.display();
+        for (const auto& pair : stations) {
+            pair.second.display();
         }
     }
 }
@@ -102,11 +101,12 @@ void PipelineSystem::addPipe() {
     int repairStatus = inputInt("В ремонте (1-да, 0-нет): ", 0, 1);
     newPipe.setRepairStatus(repairStatus == 1);
 
-    pipes.push_back(newPipe);
+    pipes[newPipe.getId()] = newPipe;
     logger.log("Добавлена труба ID: " + to_string(newPipe.getId()) + ", название: " + newPipe.getName());
     cout << "Труба успешно добавлена! ID: " << newPipe.getId() << endl;
 }
 
+// ИЗМЕНЕНО: аналогично для addCS
 void PipelineSystem::addCS() {
     cout << "\n=== ДОБАВЛЕНИЕ КОМПРЕССОРНОЙ СТАНЦИИ ===" << endl;
 
@@ -117,7 +117,7 @@ void PipelineSystem::addCS() {
     newCS.setWorkingWorkshops(inputInt("Введите количество работающих цехов: ", 0, newCS.getTotalWorkshops()));
     newCS.setEfficiencyClass(inputString("Введите класс эффективности: "));
 
-    stations.push_back(newCS);
+    stations[newCS.getId()] = newCS;
     logger.log("Добавлена КС ID: " + to_string(newCS.getId()) + ", название: " + newCS.getName());
     cout << "КС успешно добавлена! ID: " << newCS.getId() << endl;
 }
@@ -264,11 +264,7 @@ void PipelineSystem::deletePipe() {
     showAllPipes();
     int id = inputInt("Введите ID трубы для удаления: ", 1, nextPipeId - 1);
 
-    auto it = remove_if(pipes.begin(), pipes.end(),
-        [id](const Pipe& pipe) { return pipe.getId() == id; });
-
-    if (it != pipes.end()) {
-        pipes.erase(it, pipes.end());
+    if (pipes.erase(id)) {
         logger.log("Удалена труба ID: " + to_string(id));
         cout << "Труба успешно удалена!" << endl;
     }
@@ -286,11 +282,7 @@ void PipelineSystem::deleteCS() {
     showAllCS();
     int id = inputInt("Введите ID КС для удаления: ", 1, nextCSId - 1);
 
-    auto it = remove_if(stations.begin(), stations.end(),
-        [id](const CS& cs) { return cs.getId() == id; });
-
-    if (it != stations.end()) {
-        stations.erase(it, stations.end());
+    if (stations.erase(id)) {
         logger.log("Удалена КС ID: " + to_string(id));
         cout << "КС успешно удалена!" << endl;
     }

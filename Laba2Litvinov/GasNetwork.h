@@ -25,6 +25,8 @@ public:
 
     bool connectOrCreatePipe(int startId, int endId, int diameter,
         unordered_map<int, Pipe>& pipes, int& nextPipeId);
+    double calculateMaxFlow(int sourceId, int sinkId);
+    void showMaxFlow();
 
 private:
     int findAvailablePipe(int diameter) const;

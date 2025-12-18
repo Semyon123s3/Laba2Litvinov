@@ -419,7 +419,13 @@ void PipelineSystem::showCSList(const unordered_map<int, CS*>& csMap) {
         }
     }
 }
+void PipelineSystem::calculateMaxFlow() {
+    gasNetwork->showMaxFlow();
+}
 
+void PipelineSystem::calculateShortestPath() {
+    gasNetwork->showShortestPath();
+}
 void PipelineSystem::showMenu() {
     cout << "\n=== СИСТЕМА УПРАВЛЕНИЯ ТРУБОПРОВОДОМ ===" << endl;
     cout << "1. Добавить трубу" << endl;
@@ -438,6 +444,8 @@ void PipelineSystem::showMenu() {
     cout << "14. Разорвать соединение" << endl;
     cout << "15. Показать сеть" << endl;
     cout << "16. Топологическая сортировка" << endl;
+    cout << "17. Рассчитать максимальный поток" << endl;
+    cout << "18. Найти кратчайший путь" << endl;
 
     cout << "0. Выход" << endl;
     cout << "Выберите действие: ";
@@ -504,6 +512,12 @@ void PipelineSystem::run() {
             break;
         case 16:
             showTopologicalSort();
+            break;
+        case 17:
+            calculateMaxFlow();
+            break;
+        case 18:
+            calculateShortestPath();
             break;
 
         case 0:

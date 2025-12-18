@@ -51,5 +51,7 @@ public:
     void connectObjects();       
     void disconnectObjects();   
     void showTopologicalSort();  
-    void showNetwork();          
+    void showNetwork();       
+    void calculateMaxFlow();
+    void calculateShortestPath();
 };

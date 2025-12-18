@@ -27,6 +27,8 @@ public:
         unordered_map<int, Pipe>& pipes, int& nextPipeId);
     double calculateMaxFlow(int sourceId, int sinkId);
     void showMaxFlow();
+    pair<double, vector<int>> calculateShortestPath(int startId, int endId);
+    void showShortestPath();
 
 private:
     int findAvailablePipe(int diameter) const;

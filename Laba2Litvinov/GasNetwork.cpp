@@ -2,6 +2,7 @@
 #include <iostream>
 #include <algorithm>
 #include "Constants.h"
+#include <set>
 using namespace std;
 
 GasNetwork::GasNetwork(unordered_map<int, Pipe>& p, unordered_map<int, CS>& s)
@@ -384,6 +385,134 @@ void GasNetwork::showMaxFlow() {
     }
     else if (maxFlow < 1.0) {
         cout << "Примечание: поток очень мал (возможно, есть трубы в ремонте)" << endl;
+    }
+    cout << "═══════════════════════════════════════════" << endl;
+}
+
+pair<double, vector<int>> GasNetwork::calculateShortestPath(int startId, int endId) {
+    if (stations.find(startId) == stations.end() ||
+        stations.find(endId) == stations.end()) {
+        return { INFINITY_WEIGHT, {} };
+    }
+
+    unordered_map<int, double> dist;      
+    unordered_map<int, int> prev;         
+    set<pair<double, int>> priorityQueue; 
+
+    for (const auto& station : stations) {
+        dist[station.first] = INFINITY_WEIGHT;
+        prev[station.first] = -1;
+    }
+
+    dist[startId] = 0;
+    priorityQueue.insert({ 0, startId });
+
+    while (!priorityQueue.empty()) {
+        auto it = priorityQueue.begin();
+        double currentDist = it->first;
+        int u = it->second;
+        priorityQueue.erase(it);
+
+        if (u == endId) break;
+
+        for (const auto& pipePair : pipes) {
+            const Pipe& pipe = pipePair.second;
+
+            if (pipe.getIsConnected() && pipe.getStartStationId() == u) {
+                int v = pipe.getEndStationId();  
+                double weight = pipe.getWeightForPath();  
+
+                double newDist = currentDist + weight;
+
+                if (newDist < dist[v]) {
+                    auto oldPair = priorityQueue.find({ dist[v], v });
+                    if (oldPair != priorityQueue.end()) {
+                        priorityQueue.erase(oldPair);
+                    }
+
+                    dist[v] = newDist;
+                    prev[v] = u;
+
+                    priorityQueue.insert({ newDist, v });
+                }
+            }
+        }
+    }
+
+    vector<int> path;
+    if (dist[endId] < INFINITY_WEIGHT) {
+        for (int at = endId; at != -1; at = prev[at]) {
+            path.push_back(at);
+        }
+        reverse(path.begin(), path.end());
+    }
+
+    return { dist[endId], path };
+}
+
+void GasNetwork::showShortestPath() {
+    cout << "\n=== ПОИСК КРАТЧАЙШЕГО ПУТИ ===" << endl;
+
+    if (stations.size() < 2) {
+        cout << "Для поиска нужно минимум 2 КС!" << endl;
+        return;
+    }
+
+    cout << "\nДоступные компрессорные станции:" << endl;
+    for (const auto& station : stations) {
+        cout << "  КС" << station.first << " - " << station.second.getName() << endl;
+    }
+
+    int startId, endId;
+    cout << "\nВведите ID начальной КС: ";
+    cin >> startId;
+    cout << "Введите ID конечной КС: ";
+    cin >> endId;
+
+    if (stations.find(startId) == stations.end()) {
+        cout << "Ошибка: КС" << startId << " не существует!" << endl;
+        return;
+    }
+    if (stations.find(endId) == stations.end()) {
+        cout << "Ошибка: КС" << endId << " не существует!" << endl;
+        return;
+    }
+
+    auto result = calculateShortestPath(startId, endId);
+    double distance = result.first;
+    vector<int> path = result.second;
+
+    cout << "\n═══════════════════════════════════════════" << endl;
+    cout << "РЕЗУЛЬТАТЫ ПОИСКА:" << endl;
+    cout << "═══════════════════════════════════════════" << endl;
+
+    if (path.empty()) {
+        cout << "Путь от КС" << startId << " к КС" << endId << " не найден!" << endl;
+        cout << "\nВозможные причины:" << endl;
+        cout << "1. Нет соединений между этими КС" << endl;
+        cout << "2. Все трубы на пути в ремонте" << endl;
+        cout << "3. Граф несвязный" << endl;
+    }
+    else {
+        cout << "Кратчайший путь от КС" << startId << " к КС" << endId << ":" << endl;
+        cout << "  Общая длина: " << distance << " км" << endl;
+        cout << "  Маршрут: ";
+
+        for (size_t i = 0; i < path.size(); ++i) {
+            cout << "КС" << path[i];
+            if (i < path.size() - 1) {
+                cout << " -> ";
+            }
+        }
+        cout << endl;
+
+
+        cout << "\nИнформация о пути:" << endl;
+        cout << "  Количество переходов: " << path.size() - 1 << endl;
+
+        if (distance >= INFINITY_WEIGHT * 0.9) {
+            cout << "  ВНИМАНИЕ: На пути есть трубы в ремонте!" << endl;
+        }
     }
     cout << "═══════════════════════════════════════════" << endl;
 }

@@ -1,4 +1,6 @@
 #include "Pipe.h"
+#include "Constants.h"
+#include <limits>
 
 Pipe::Pipe(int id) : id(id), length(0.0), diameter(0), inRepair(false),
 isConnected(false), startStationId(-1), endStationId(-1) {
@@ -26,4 +28,23 @@ void Pipe::display() const {
 
 void Pipe::toggleRepair() {
     inRepair = !inRepair;
+}
+
+double Pipe::getCapacity() const {
+    if (inRepair) {
+        return 0.0;
+    }
+
+    auto it = PIPE_DIAMETERS_CAPACITY.find(diameter);
+    if (it != PIPE_DIAMETERS_CAPACITY.end()) {
+        return it->second;
+    }
+    return 0.0; 
+}
+
+double Pipe::getWeightForPath() const {
+    if (inRepair) {
+        return INFINITY_WEIGHT; 
+    }
+    return length; 
 }

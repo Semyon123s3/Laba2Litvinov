@@ -51,4 +51,6 @@ public:
     bool isConnectedToStation(int stationId) const {
         return isConnected && (startStationId == stationId || endStationId == stationId);
     }
+    double getCapacity() const;
+    double getWeightForPath() const;
 };

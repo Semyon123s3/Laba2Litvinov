@@ -1,10 +1,11 @@
-#include "PipelineSystem.h"
+п»ї#include "PipelineSystem.h"
 #include <iostream>
 #include <limits>
 #include <algorithm>
 #include <sstream>
 #include <unordered_map>
 #include "GasNetwork.h"
+#include "Constants.h" 
 using namespace std;
 
 PipelineSystem::PipelineSystem() : nextPipeId(1), nextCSId(1) {
@@ -23,7 +24,7 @@ string PipelineSystem::inputString(const string& prompt) {
         if (!result.empty()) {
             return result;
         }
-        cout << "Ошибка! Поле не может быть пустым. Попробуйте снова." << endl;
+        cout << "РћС€РёР±РєР°! РџРѕР»Рµ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РїСѓСЃС‚С‹Рј. РџРѕРїСЂРѕР±СѓР№С‚Рµ СЃРЅРѕРІР°." << endl;
     }
 }
 
@@ -35,7 +36,7 @@ int PipelineSystem::inputInt(const string& prompt, int min, int max) {
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             return value;
         }
-        cout << "Ошибка! Введите целое число от " << min << " до " << max << ": ";
+        cout << "РћС€РёР±РєР°! Р’РІРµРґРёС‚Рµ С†РµР»РѕРµ С‡РёСЃР»Рѕ РѕС‚ " << min << " РґРѕ " << max << ": ";
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
     }
@@ -49,7 +50,7 @@ double PipelineSystem::inputDouble(const string& prompt, double min, double max)
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             return value;
         }
-        cout << "Ошибка! Введите число от " << min << " до " << max << ": ";
+        cout << "РћС€РёР±РєР°! Р’РІРµРґРёС‚Рµ С‡РёСЃР»Рѕ РѕС‚ " << min << " РґРѕ " << max << ": ";
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
     }
@@ -72,9 +73,9 @@ CS* PipelineSystem::findCSById(int id) {
 }
 
 void PipelineSystem::showAllPipes() {
-    cout << "\n--- ВСЕ ТРУБЫ ---" << endl;
+    cout << "\n--- Р’РЎР• РўР РЈР‘Р« ---" << endl;
     if (pipes.empty()) {
-        cout << "Трубы не добавлены." << endl;
+        cout << "РўСЂСѓР±С‹ РЅРµ РґРѕР±Р°РІР»РµРЅС‹." << endl;
     }
     else {
         for (const auto& pair : pipes) {   
@@ -85,9 +86,9 @@ void PipelineSystem::showAllPipes() {
 
 
 void PipelineSystem::showAllCS() {
-    cout << "\n--- ВСЕ КС ---" << endl;
+    cout << "\n--- Р’РЎР• РљРЎ ---" << endl;
     if (stations.empty()) {
-        cout << "КС не добавлены." << endl;
+        cout << "РљРЎ РЅРµ РґРѕР±Р°РІР»РµРЅС‹." << endl;
     }
     else {
         for (const auto& pair : stations) {
@@ -97,218 +98,235 @@ void PipelineSystem::showAllCS() {
 }
 
 void PipelineSystem::addPipe() {
-    cout << "\n=== ДОБАВЛЕНИЕ ТРУБЫ ===" << endl;
+    cout << "\n=== Р”РћР‘РђР’Р›Р•РќРР• РўР РЈР‘Р« ===" << endl;
 
     Pipe newPipe(nextPipeId++);
 
-    newPipe.setName(inputString("Введите километровую отметку (название): "));
-    newPipe.setLength(inputDouble("Введите длину трубы (км): ", 0.1, 10000.0));
-    newPipe.setDiameter(inputInt("Введите диаметр трубы (мм): ", 1, 5000));
+    newPipe.setName(inputString("Р’РІРµРґРёС‚Рµ РєРёР»РѕРјРµС‚СЂРѕРІСѓСЋ РѕС‚РјРµС‚РєСѓ (РЅР°Р·РІР°РЅРёРµ): "));
+    newPipe.setLength(inputDouble("Р’РІРµРґРёС‚Рµ РґР»РёРЅСѓ С‚СЂСѓР±С‹ (РєРј): ", 0.1, 10000.0));
+    newPipe.setDiameter(inputInt("Р’РІРµРґРёС‚Рµ РґРёР°РјРµС‚СЂ С‚СЂСѓР±С‹ (РјРј): ", 1, 5000));
 
-    int repairStatus = inputInt("В ремонте (1-да, 0-нет): ", 0, 1);
+    int repairStatus = inputInt("Р’ СЂРµРјРѕРЅС‚Рµ (1-РґР°, 0-РЅРµС‚): ", 0, 1);
     newPipe.setRepairStatus(repairStatus == 1);
 
     pipes[newPipe.getId()] = newPipe;
-    logger.log("Добавлена труба ID: " + to_string(newPipe.getId()) + ", название: " + newPipe.getName());
-    cout << "Труба успешно добавлена! ID: " << newPipe.getId() << endl;
+    logger.log("Р”РѕР±Р°РІР»РµРЅР° С‚СЂСѓР±Р° ID: " + to_string(newPipe.getId()) + ", РЅР°Р·РІР°РЅРёРµ: " + newPipe.getName());
+    cout << "РўСЂСѓР±Р° СѓСЃРїРµС€РЅРѕ РґРѕР±Р°РІР»РµРЅР°! ID: " << newPipe.getId() << endl;
+
+    cout << "\nР”РѕРїСѓСЃС‚РёРјС‹Рµ РґРёР°РјРµС‚СЂС‹ С‚СЂСѓР±:\n";
+    for (const auto& pair : PIPE_DIAMETERS_CAPACITY) {
+        cout << pair.first << " РјРј -> " << pair.second << " РјР»РЅ РјВі/РґРµРЅСЊ\n";
+    }
+
+    int diameter;
+    bool valid = false;
+    while (!valid) {
+        diameter = inputInt("Р’С‹Р±РµСЂРёС‚Рµ РґРёР°РјРµС‚СЂ РёР· СЃРїРёСЃРєР°: ", 1, 5000);
+        if (PIPE_DIAMETERS_CAPACITY.find(diameter) != PIPE_DIAMETERS_CAPACITY.end()) {
+            valid = true;
+        }
+        else {
+            cout << "РќРµРІРµСЂРЅС‹Р№ РґРёР°РјРµС‚СЂ! Р’С‹Р±РµСЂРёС‚Рµ РёР· СЃРїРёСЃРєР°.\n";
+        }
+    }
 }
 
 void PipelineSystem::addCS() {
-    cout << "\n=== ДОБАВЛЕНИЕ КОМПРЕССОРНОЙ СТАНЦИИ ===" << endl;
+    cout << "\n=== Р”РћР‘РђР’Р›Р•РќРР• РљРћРњРџР Р•РЎРЎРћР РќРћР™ РЎРўРђРќР¦РР ===" << endl;
 
     CS newCS(nextCSId++);
 
-    newCS.setName(inputString("Введите название КС: "));
-    newCS.setTotalWorkshops(inputInt("Введите общее количество цехов: ", 1, 1000));
-    newCS.setWorkingWorkshops(inputInt("Введите количество работающих цехов: ", 0, newCS.getTotalWorkshops()));
-    newCS.setEfficiencyClass(inputString("Введите класс эффективности: "));
+    newCS.setName(inputString("Р’РІРµРґРёС‚Рµ РЅР°Р·РІР°РЅРёРµ РљРЎ: "));
+    newCS.setTotalWorkshops(inputInt("Р’РІРµРґРёС‚Рµ РѕР±С‰РµРµ РєРѕР»РёС‡РµСЃС‚РІРѕ С†РµС…РѕРІ: ", 1, 1000));
+    newCS.setWorkingWorkshops(inputInt("Р’РІРµРґРёС‚Рµ РєРѕР»РёС‡РµСЃС‚РІРѕ СЂР°Р±РѕС‚Р°СЋС‰РёС… С†РµС…РѕРІ: ", 0, newCS.getTotalWorkshops()));
+    newCS.setEfficiencyClass(inputString("Р’РІРµРґРёС‚Рµ РєР»Р°СЃСЃ СЌС„С„РµРєС‚РёРІРЅРѕСЃС‚Рё: "));
 
     stations[newCS.getId()] = newCS;
-    logger.log("Добавлена КС ID: " + to_string(newCS.getId()) + ", название: " + newCS.getName());
-    cout << "КС успешно добавлена! ID: " << newCS.getId() << endl;
+    logger.log("Р”РѕР±Р°РІР»РµРЅР° РљРЎ ID: " + to_string(newCS.getId()) + ", РЅР°Р·РІР°РЅРёРµ: " + newCS.getName());
+    cout << "РљРЎ СѓСЃРїРµС€РЅРѕ РґРѕР±Р°РІР»РµРЅР°! ID: " << newCS.getId() << endl;
 }
 
 void PipelineSystem::showAllObjects() {
-    cout << "\n=== ВСЕ ОБЪЕКТЫ ===" << endl;
+    cout << "\n=== Р’РЎР• РћР‘РЄР•РљРўР« ===" << endl;
 
-    cout << "\n--- ТРУБЫ (" << pipes.size() << ") ---" << endl;
+    cout << "\n--- РўР РЈР‘Р« (" << pipes.size() << ") ---" << endl;
     if (pipes.empty()) {
-        cout << "Трубы не добавлены." << endl;
+        cout << "РўСЂСѓР±С‹ РЅРµ РґРѕР±Р°РІР»РµРЅС‹." << endl;
     }
     else {
-        for (const auto& pipe : pipes) {
-            pipe.display();
+        for (const auto& pair : pipes) {
+            pair.second.display();  
         }
     }
 
-    cout << "\n--- КОМПРЕССОРНЫЕ СТАНЦИИ (" << stations.size() << ") ---" << endl;
+    cout << "\n--- РљРћРњРџР Р•РЎРЎРћР РќР«Р• РЎРўРђРќР¦РР (" << stations.size() << ") ---" << endl;
     if (stations.empty()) {
-        cout << "КС не добавлены." << endl;
+        cout << "РљРЎ РЅРµ РґРѕР±Р°РІР»РµРЅС‹." << endl;
     }
     else {
-        for (const auto& cs : stations) {
-            cs.display();
+        for (const auto& pair : stations) {
+            pair.second.display();  
         }
     }
 
-    logger.log("Просмотр всех объектов");
+    logger.log("РџСЂРѕСЃРјРѕС‚СЂ РІСЃРµС… РѕР±СЉРµРєС‚РѕРІ");
 }
 
 void PipelineSystem::editPipe() {
     if (pipes.empty()) {
-        cout << "Нет доступных труб для редактирования." << endl;
+        cout << "РќРµС‚ РґРѕСЃС‚СѓРїРЅС‹С… С‚СЂСѓР± РґР»СЏ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ." << endl;
         return;
     }
 
     showAllPipes();
-    int id = inputInt("Введите ID трубы для редактирования: ", 1, nextPipeId - 1);
+    int id = inputInt("Р’РІРµРґРёС‚Рµ ID С‚СЂСѓР±С‹ РґР»СЏ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ: ", 1, nextPipeId - 1);
 
     Pipe* pipe = findPipeById(id);
     if (!pipe) {
-        cout << "Труба с ID " << id << " не найдена." << endl;
+        cout << "РўСЂСѓР±Р° СЃ ID " << id << " РЅРµ РЅР°Р№РґРµРЅР°." << endl;
         return;
     }
 
-    cout << "\nРедактирование трубы ID: " << pipe->getId() << endl;
+    cout << "\nР РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ С‚СЂСѓР±С‹ ID: " << pipe->getId() << endl;
 
-    cout << "Выберите что редактировать:" << endl;
-    cout << "1. Основные параметры" << endl;
-    cout << "2. Переключить статус ремонта" << endl;
+    cout << "Р’С‹Р±РµСЂРёС‚Рµ С‡С‚Рѕ СЂРµРґР°РєС‚РёСЂРѕРІР°С‚СЊ:" << endl;
+    cout << "1. РћСЃРЅРѕРІРЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹" << endl;
+    cout << "2. РџРµСЂРµРєР»СЋС‡РёС‚СЊ СЃС‚Р°С‚СѓСЃ СЂРµРјРѕРЅС‚Р°" << endl;
 
-    int editType = inputInt("Ваш выбор: ", 1, 2);
+    int editType = inputInt("Р’Р°С€ РІС‹Р±РѕСЂ: ", 1, 2);
 
     if (editType == 1) {
-        pipe->setName(inputString("Новое название: "));
-        pipe->setLength(inputDouble("Новая длина (км): ", 0.1, 10000.0));
-        pipe->setDiameter(inputInt("Новый диаметр (мм): ", 1, 5000));
+        pipe->setName(inputString("РќРѕРІРѕРµ РЅР°Р·РІР°РЅРёРµ: "));
+        pipe->setLength(inputDouble("РќРѕРІР°СЏ РґР»РёРЅР° (РєРј): ", 0.1, 10000.0));
+        pipe->setDiameter(inputInt("РќРѕРІС‹Р№ РґРёР°РјРµС‚СЂ (РјРј): ", 1, 5000));
 
-        int repairStatus = inputInt("В ремонте (1-да, 0-нет): ", 0, 1);
+        int repairStatus = inputInt("Р’ СЂРµРјРѕРЅС‚Рµ (1-РґР°, 0-РЅРµС‚): ", 0, 1);
         pipe->setRepairStatus(repairStatus == 1);
     }
     else {
         pipe->toggleRepair();
-        cout << "Статус ремонта изменен. Теперь: "
-            << (pipe->isInRepair() ? "в ремонте" : "не в ремонте") << endl;
+        cout << "РЎС‚Р°С‚СѓСЃ СЂРµРјРѕРЅС‚Р° РёР·РјРµРЅРµРЅ. РўРµРїРµСЂСЊ: "
+            << (pipe->isInRepair() ? "РІ СЂРµРјРѕРЅС‚Рµ" : "РЅРµ РІ СЂРµРјРѕРЅС‚Рµ") << endl;
     }
 
-    logger.log("Отредактирована труба ID: " + to_string(pipe->getId()));
-    cout << "Труба успешно отредактирована!" << endl;
+    logger.log("РћС‚СЂРµРґР°РєС‚РёСЂРѕРІР°РЅР° С‚СЂСѓР±Р° ID: " + to_string(pipe->getId()));
+    cout << "РўСЂСѓР±Р° СѓСЃРїРµС€РЅРѕ РѕС‚СЂРµРґР°РєС‚РёСЂРѕРІР°РЅР°!" << endl;
 }
 
 void PipelineSystem::editCS() {
     if (stations.empty()) {
-        cout << "Нет доступных КС для редактирования." << endl;
+        cout << "РќРµС‚ РґРѕСЃС‚СѓРїРЅС‹С… РљРЎ РґР»СЏ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ." << endl;
         return;
     }
 
     showAllCS();
-    int id = inputInt("Введите ID КС для редактирования: ", 1, nextCSId - 1);
+    int id = inputInt("Р’РІРµРґРёС‚Рµ ID РљРЎ РґР»СЏ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ: ", 1, nextCSId - 1);
 
     CS* cs = findCSById(id);
     if (!cs) {
-        cout << "КС с ID " << id << " не найдена." << endl;
+        cout << "РљРЎ СЃ ID " << id << " РЅРµ РЅР°Р№РґРµРЅР°." << endl;
         return;
     }
 
-    cout << "\nРедактирование КС ID: " << cs->getId() << endl;
+    cout << "\nР РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ РљРЎ ID: " << cs->getId() << endl;
 
-    cout << "Выберите что редактировать:" << endl;
-    cout << "1. Основные параметры" << endl;
-    cout << "2. Управление цехами" << endl;
+    cout << "Р’С‹Р±РµСЂРёС‚Рµ С‡С‚Рѕ СЂРµРґР°РєС‚РёСЂРѕРІР°С‚СЊ:" << endl;
+    cout << "1. РћСЃРЅРѕРІРЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹" << endl;
+    cout << "2. РЈРїСЂР°РІР»РµРЅРёРµ С†РµС…Р°РјРё" << endl;
 
-    int editType = inputInt("Ваш выбор: ", 1, 2);
+    int editType = inputInt("Р’Р°С€ РІС‹Р±РѕСЂ: ", 1, 2);
 
     if (editType == 1) {
-        cs->setName(inputString("Новое название: "));
-        cs->setTotalWorkshops(inputInt("Общее количество цехов: ", 1, 1000));
-        cs->setWorkingWorkshops(inputInt("Количество работающих цехов: ", 0, cs->getTotalWorkshops()));
-        cs->setEfficiencyClass(inputString("Класс эффективности: "));
+        cs->setName(inputString("РќРѕРІРѕРµ РЅР°Р·РІР°РЅРёРµ: "));
+        cs->setTotalWorkshops(inputInt("РћР±С‰РµРµ РєРѕР»РёС‡РµСЃС‚РІРѕ С†РµС…РѕРІ: ", 1, 1000));
+        cs->setWorkingWorkshops(inputInt("РљРѕР»РёС‡РµСЃС‚РІРѕ СЂР°Р±РѕС‚Р°СЋС‰РёС… С†РµС…РѕРІ: ", 0, cs->getTotalWorkshops()));
+        cs->setEfficiencyClass(inputString("РљР»Р°СЃСЃ СЌС„С„РµРєС‚РёРІРЅРѕСЃС‚Рё: "));
     }
     else {
-        cout << "\nТекущее состояние: " << cs->getWorkingWorkshops() << " из " << cs->getTotalWorkshops() << " цехов работают" << endl;
-        cout << "1. Запустить цех" << endl;
-        cout << "2. Остановить цех" << endl;
-        cout << "0. Отмена" << endl;
+        cout << "\nРўРµРєСѓС‰РµРµ СЃРѕСЃС‚РѕСЏРЅРёРµ: " << cs->getWorkingWorkshops() << " РёР· " << cs->getTotalWorkshops() << " С†РµС…РѕРІ СЂР°Р±РѕС‚Р°СЋС‚" << endl;
+        cout << "1. Р—Р°РїСѓСЃС‚РёС‚СЊ С†РµС…" << endl;
+        cout << "2. РћСЃС‚Р°РЅРѕРІРёС‚СЊ С†РµС…" << endl;
+        cout << "0. РћС‚РјРµРЅР°" << endl;
 
-        int action = inputInt("Выберите действие: ", 0, 2);
+        int action = inputInt("Р’С‹Р±РµСЂРёС‚Рµ РґРµР№СЃС‚РІРёРµ: ", 0, 2);
 
         switch (action) {
         case 1:
             if (cs->startWorkshop()) {
-                cout << "Цех запущен! Теперь работает " << cs->getWorkingWorkshops()
-                    << " из " << cs->getTotalWorkshops() << " цехов." << endl;
+                cout << "Р¦РµС… Р·Р°РїСѓС‰РµРЅ! РўРµРїРµСЂСЊ СЂР°Р±РѕС‚Р°РµС‚ " << cs->getWorkingWorkshops()
+                    << " РёР· " << cs->getTotalWorkshops() << " С†РµС…РѕРІ." << endl;
             }
             else {
-                cout << "Ошибка: Все цехи уже работают!" << endl;
+                cout << "РћС€РёР±РєР°: Р’СЃРµ С†РµС…Рё СѓР¶Рµ СЂР°Р±РѕС‚Р°СЋС‚!" << endl;
             }
             break;
         case 2:
             if (cs->stopWorkshop()) {
-                cout << "Цех остановлен! Теперь работает " << cs->getWorkingWorkshops()
-                    << " из " << cs->getTotalWorkshops() << " цехов." << endl;
+                cout << "Р¦РµС… РѕСЃС‚Р°РЅРѕРІР»РµРЅ! РўРµРїРµСЂСЊ СЂР°Р±РѕС‚Р°РµС‚ " << cs->getWorkingWorkshops()
+                    << " РёР· " << cs->getTotalWorkshops() << " С†РµС…РѕРІ." << endl;
             }
             else {
-                cout << "Ошибка: Нет работающих цехов!" << endl;
+                cout << "РћС€РёР±РєР°: РќРµС‚ СЂР°Р±РѕС‚Р°СЋС‰РёС… С†РµС…РѕРІ!" << endl;
             }
             break;
         case 0:
-            cout << "Операция отменена." << endl;
+            cout << "РћРїРµСЂР°С†РёСЏ РѕС‚РјРµРЅРµРЅР°." << endl;
             break;
         }
     }
 
-    logger.log("Отредактирована КС ID: " + to_string(cs->getId()));
-    cout << "КС успешно отредактирована!" << endl;
+    logger.log("РћС‚СЂРµРґР°РєС‚РёСЂРѕРІР°РЅР° РљРЎ ID: " + to_string(cs->getId()));
+    cout << "РљРЎ СѓСЃРїРµС€РЅРѕ РѕС‚СЂРµРґР°РєС‚РёСЂРѕРІР°РЅР°!" << endl;
 }
 
 void PipelineSystem::deletePipe() {
     if (pipes.empty()) {
-        cout << "Нет доступных труб для удаления." << endl;
+        cout << "РќРµС‚ РґРѕСЃС‚СѓРїРЅС‹С… С‚СЂСѓР± РґР»СЏ СѓРґР°Р»РµРЅРёСЏ." << endl;
         return;
     }
 
     showAllPipes();
-    int id = inputInt("Введите ID трубы для удаления: ", 1, nextPipeId - 1);
+    int id = inputInt("Р’РІРµРґРёС‚Рµ ID С‚СЂСѓР±С‹ РґР»СЏ СѓРґР°Р»РµРЅРёСЏ: ", 1, nextPipeId - 1);
 
     if (pipes.erase(id)) {
-        logger.log("Удалена труба ID: " + to_string(id));
-        cout << "Труба успешно удалена!" << endl;
+        logger.log("РЈРґР°Р»РµРЅР° С‚СЂСѓР±Р° ID: " + to_string(id));
+        cout << "РўСЂСѓР±Р° СѓСЃРїРµС€РЅРѕ СѓРґР°Р»РµРЅР°!" << endl;
     }
     else {
-        cout << "Труба с ID " << id << " не найдена." << endl;
+        cout << "РўСЂСѓР±Р° СЃ ID " << id << " РЅРµ РЅР°Р№РґРµРЅР°." << endl;
     }
 }
 
 void PipelineSystem::deleteCS() {
     if (stations.empty()) {
-        cout << "Нет доступных КС для удаления." << endl;
+        cout << "РќРµС‚ РґРѕСЃС‚СѓРїРЅС‹С… РљРЎ РґР»СЏ СѓРґР°Р»РµРЅРёСЏ." << endl;
         return;
     }
 
     showAllCS();
-    int id = inputInt("Введите ID КС для удаления: ", 1, nextCSId - 1);
+    int id = inputInt("Р’РІРµРґРёС‚Рµ ID РљРЎ РґР»СЏ СѓРґР°Р»РµРЅРёСЏ: ", 1, nextCSId - 1);
 
     if (stations.erase(id)) {
-        logger.log("Удалена КС ID: " + to_string(id));
-        cout << "КС успешно удалена!" << endl;
+        logger.log("РЈРґР°Р»РµРЅР° РљРЎ ID: " + to_string(id));
+        cout << "РљРЎ СѓСЃРїРµС€РЅРѕ СѓРґР°Р»РµРЅР°!" << endl;
     }
     else {
-        cout << "КС с ID " << id << " не найдена." << endl;
+        cout << "РљРЎ СЃ ID " << id << " РЅРµ РЅР°Р№РґРµРЅР°." << endl;
     }
 }
 
 void PipelineSystem::searchPipes() {
-    cout << "\n=== ПОИСК ТРУБ ===" << endl;
-    cout << "1. По названию" << endl;
-    cout << "2. По признаку 'в ремонте'" << endl;
-    cout << "3. Все трубы" << endl;
+    cout << "\n=== РџРћРРЎРљ РўР РЈР‘ ===" << endl;
+    cout << "1. РџРѕ РЅР°Р·РІР°РЅРёСЋ" << endl;
+    cout << "2. РџРѕ РїСЂРёР·РЅР°РєСѓ 'РІ СЂРµРјРѕРЅС‚Рµ'" << endl;
+    cout << "3. Р’СЃРµ С‚СЂСѓР±С‹" << endl;
 
-    int choice = inputInt("Выберите критерий поиска: ", 1, 3);
+    int choice = inputInt("Р’С‹Р±РµСЂРёС‚Рµ РєСЂРёС‚РµСЂРёР№ РїРѕРёСЃРєР°: ", 1, 3);
     unordered_map<int, Pipe*> foundPipes;   
 
     switch (choice) {
     case 1: {
-        string name = inputString("Введите название для поиска: ");
+        string name = inputString("Р’РІРµРґРёС‚Рµ РЅР°Р·РІР°РЅРёРµ РґР»СЏ РїРѕРёСЃРєР°: ");
         for (auto& pair : pipes) {   
             if (pair.second.getName().find(name) != string::npos) {
                 foundPipes[pair.first] = &pair.second;   
@@ -317,7 +335,7 @@ void PipelineSystem::searchPipes() {
         break;
     }
     case 2: {
-        bool status = inputInt("В ремонте (1-да, 0-нет): ", 0, 1) == 1;
+        bool status = inputInt("Р’ СЂРµРјРѕРЅС‚Рµ (1-РґР°, 0-РЅРµС‚): ", 0, 1) == 1;
         for (auto& pair : pipes) {
             if (pair.second.isInRepair() == status) {
                 foundPipes[pair.first] = &pair.second;
@@ -333,21 +351,21 @@ void PipelineSystem::searchPipes() {
     }
 
     showPipesList(foundPipes);   
-    logger.log("Поиск труб: найдено " + to_string(foundPipes.size()) + " объектов");
+    logger.log("РџРѕРёСЃРє С‚СЂСѓР±: РЅР°Р№РґРµРЅРѕ " + to_string(foundPipes.size()) + " РѕР±СЉРµРєС‚РѕРІ");
 }
 
 void PipelineSystem::searchCS() {
-    cout << "\n=== ПОИСК КС ===" << endl;
-    cout << "1. По названию" << endl;
-    cout << "2. По проценту незадействованных цехов" << endl;
-    cout << "3. Все КС" << endl;
+    cout << "\n=== РџРћРРЎРљ РљРЎ ===" << endl;
+    cout << "1. РџРѕ РЅР°Р·РІР°РЅРёСЋ" << endl;
+    cout << "2. РџРѕ РїСЂРѕС†РµРЅС‚Сѓ РЅРµР·Р°РґРµР№СЃС‚РІРѕРІР°РЅРЅС‹С… С†РµС…РѕРІ" << endl;
+    cout << "3. Р’СЃРµ РљРЎ" << endl;
 
-    int choice = inputInt("Выберите критерий поиска: ", 1, 3);
+    int choice = inputInt("Р’С‹Р±РµСЂРёС‚Рµ РєСЂРёС‚РµСЂРёР№ РїРѕРёСЃРєР°: ", 1, 3);
     unordered_map<int, CS*> foundCS;   
 
     switch (choice) {
     case 1: {
-        string name = inputString("Введите название для поиска: ");
+        string name = inputString("Р’РІРµРґРёС‚Рµ РЅР°Р·РІР°РЅРёРµ РґР»СЏ РїРѕРёСЃРєР°: ");
         for (auto& pair : stations) {
             if (pair.second.getName().find(name) != string::npos) {
                 foundCS[pair.first] = &pair.second;
@@ -356,8 +374,8 @@ void PipelineSystem::searchCS() {
         break;
     }
     case 2: {
-        double minPercent = inputDouble("Минимальный процент незадействованных цехов: ", 0, 100);
-        double maxPercent = inputDouble("Максимальный процент незадействованных цехов: ", minPercent, 100);
+        double minPercent = inputDouble("РњРёРЅРёРјР°Р»СЊРЅС‹Р№ РїСЂРѕС†РµРЅС‚ РЅРµР·Р°РґРµР№СЃС‚РІРѕРІР°РЅРЅС‹С… С†РµС…РѕРІ: ", 0, 100);
+        double maxPercent = inputDouble("РњР°РєСЃРёРјР°Р»СЊРЅС‹Р№ РїСЂРѕС†РµРЅС‚ РЅРµР·Р°РґРµР№СЃС‚РІРѕРІР°РЅРЅС‹С… С†РµС…РѕРІ: ", minPercent, 100);
 
         for (auto& pair : stations) {
             double percent = pair.second.getUnusedPercentage();
@@ -375,13 +393,13 @@ void PipelineSystem::searchCS() {
     }
 
     showCSList(foundCS);  
-    logger.log("Поиск КС: найдено " + to_string(foundCS.size()) + " объектов");
+    logger.log("РџРѕРёСЃРє РљРЎ: РЅР°Р№РґРµРЅРѕ " + to_string(foundCS.size()) + " РѕР±СЉРµРєС‚РѕРІ");
 }
 
 void PipelineSystem::showPipesList(const unordered_map<int, Pipe*>& pipeMap) {
-    cout << "\n--- НАЙДЕННЫЕ ТРУБЫ (" << pipeMap.size() << ") ---" << endl;
+    cout << "\n--- РќРђР™Р”Р•РќРќР«Р• РўР РЈР‘Р« (" << pipeMap.size() << ") ---" << endl;
     if (pipeMap.empty()) {
-        cout << "Трубы не найдены." << endl;
+        cout << "РўСЂСѓР±С‹ РЅРµ РЅР°Р№РґРµРЅС‹." << endl;
     }
     else {
         for (const auto& pair : pipeMap) {   
@@ -391,9 +409,9 @@ void PipelineSystem::showPipesList(const unordered_map<int, Pipe*>& pipeMap) {
 }
 
 void PipelineSystem::showCSList(const unordered_map<int, CS*>& csMap) {
-    cout << "\n--- НАЙДЕННЫЕ КС (" << csMap.size() << ") ---" << endl;
+    cout << "\n--- РќРђР™Р”Р•РќРќР«Р• РљРЎ (" << csMap.size() << ") ---" << endl;
     if (csMap.empty()) {
-        cout << "КС не найдены." << endl;
+        cout << "РљРЎ РЅРµ РЅР°Р№РґРµРЅС‹." << endl;
     }
     else {
         for (const auto& pair : csMap) {
@@ -403,26 +421,26 @@ void PipelineSystem::showCSList(const unordered_map<int, CS*>& csMap) {
 }
 
 void PipelineSystem::showMenu() {
-    cout << "\n=== СИСТЕМА УПРАВЛЕНИЯ ТРУБОПРОВОДОМ ===" << endl;
-    cout << "1. Добавить трубу" << endl;
-    cout << "2. Добавить КС" << endl;
-    cout << "3. Просмотр всех объектов" << endl;
-    cout << "4. Редактировать трубу" << endl;
-    cout << "5. Редактировать КС" << endl;
-    cout << "6. Удалить трубу" << endl;
-    cout << "7. Удалить КС" << endl;
-    cout << "8. Поиск труб" << endl;
-    cout << "9. Поиск КС" << endl;
-    cout << "10. Пакетное редактирование труб" << endl;
-    cout << "11. Сохранить в файл" << endl;
-    cout << "12. Загрузить из файла" << endl;
-    cout << "13. Соединить КС в сеть" << endl;
-    cout << "14. Разорвать соединение" << endl;
-    cout << "15. Показать сеть" << endl;
-    cout << "16. Топологическая сортировка" << endl;
+    cout << "\n=== РЎРРЎРўР•РњРђ РЈРџР РђР’Р›Р•РќРРЇ РўР РЈР‘РћРџР РћР’РћР”РћРњ ===" << endl;
+    cout << "1. Р”РѕР±Р°РІРёС‚СЊ С‚СЂСѓР±Сѓ" << endl;
+    cout << "2. Р”РѕР±Р°РІРёС‚СЊ РљРЎ" << endl;
+    cout << "3. РџСЂРѕСЃРјРѕС‚СЂ РІСЃРµС… РѕР±СЉРµРєС‚РѕРІ" << endl;
+    cout << "4. Р РµРґР°РєС‚РёСЂРѕРІР°С‚СЊ С‚СЂСѓР±Сѓ" << endl;
+    cout << "5. Р РµРґР°РєС‚РёСЂРѕРІР°С‚СЊ РљРЎ" << endl;
+    cout << "6. РЈРґР°Р»РёС‚СЊ С‚СЂСѓР±Сѓ" << endl;
+    cout << "7. РЈРґР°Р»РёС‚СЊ РљРЎ" << endl;
+    cout << "8. РџРѕРёСЃРє С‚СЂСѓР±" << endl;
+    cout << "9. РџРѕРёСЃРє РљРЎ" << endl;
+    cout << "10. РџР°РєРµС‚РЅРѕРµ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ С‚СЂСѓР±" << endl;
+    cout << "11. РЎРѕС…СЂР°РЅРёС‚СЊ РІ С„Р°Р№Р»" << endl;
+    cout << "12. Р—Р°РіСЂСѓР·РёС‚СЊ РёР· С„Р°Р№Р»Р°" << endl;
+    cout << "13. РЎРѕРµРґРёРЅРёС‚СЊ РљРЎ РІ СЃРµС‚СЊ" << endl;
+    cout << "14. Р Р°Р·РѕСЂРІР°С‚СЊ СЃРѕРµРґРёРЅРµРЅРёРµ" << endl;
+    cout << "15. РџРѕРєР°Р·Р°С‚СЊ СЃРµС‚СЊ" << endl;
+    cout << "16. РўРѕРїРѕР»РѕРіРёС‡РµСЃРєР°СЏ СЃРѕСЂС‚РёСЂРѕРІРєР°" << endl;
 
-    cout << "0. Выход" << endl;
-    cout << "Выберите действие: ";
+    cout << "0. Р’С‹С…РѕРґ" << endl;
+    cout << "Р’С‹Р±РµСЂРёС‚Рµ РґРµР№СЃС‚РІРёРµ: ";
 }
 
 void PipelineSystem::run() {
@@ -430,7 +448,7 @@ void PipelineSystem::run() {
     while (true) {
         showMenu();
         if (!(cin >> choice) || cin.peek() != '\n') {
-            cout << "Ошибка ввода! Пожалуйста, введите число." << endl;
+            cout << "РћС€РёР±РєР° РІРІРѕРґР°! РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РІРІРµРґРёС‚Рµ С‡РёСЃР»Рѕ." << endl;
             cin.clear();
             cin.ignore(1000, '\n');
             continue;
@@ -489,38 +507,40 @@ void PipelineSystem::run() {
             break;
 
         case 0:
-            cout << "Выход из программы." << endl;
+            cout << "Р’С‹С…РѕРґ РёР· РїСЂРѕРіСЂР°РјРјС‹." << endl;
             return;
         default:
-            cout << "Неверный выбор! Пожалуйста, выберите действие из меню." << endl;
+            cout << "РќРµРІРµСЂРЅС‹Р№ РІС‹Р±РѕСЂ! РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РІС‹Р±РµСЂРёС‚Рµ РґРµР№СЃС‚РІРёРµ РёР· РјРµРЅСЋ." << endl;
         }
 
-        cout << "\nНажмите Enter для продолжения...";
+        cout << "\nРќР°Р¶РјРёС‚Рµ Enter РґР»СЏ РїСЂРѕРґРѕР»Р¶РµРЅРёСЏ...";
         cin.get();
     }
 }
 
 
 void PipelineSystem::batchEditPipes() {
-    cout << "\n=== ПАКЕТНОЕ РЕДАКТИРОВАНИЕ ТРУБ ===" << endl;
+    cout << "\n=== РџРђРљР•РўРќРћР• Р Р•Р”РђРљРўРР РћР’РђРќРР• РўР РЈР‘ ===" << endl;
 
     if (pipes.empty()) {
-        cout << "Нет доступных труб для редактирования." << endl;
+        cout << "РќРµС‚ РґРѕСЃС‚СѓРїРЅС‹С… С‚СЂСѓР± РґР»СЏ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ." << endl;
         return;
     }
 
     unordered_map<int, Pipe*> foundPipes;
-    cout << "Сначала выполним поиск труб:" << endl;
+    cout << "РЎРЅР°С‡Р°Р»Р° РІС‹РїРѕР»РЅРёРј РїРѕРёСЃРє С‚СЂСѓР±:" << endl;
     searchPipes();   
 
-    cout << "\nВведите ID труб через пробел для редактирования (или 'all' для всех найденных): ";
+    cout << "\nР’РІРµРґРёС‚Рµ ID С‚СЂСѓР± С‡РµСЂРµР· РїСЂРѕР±РµР» РґР»СЏ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ (РёР»Рё 'all' РґР»СЏ РІСЃРµС… РЅР°Р№РґРµРЅРЅС‹С…): ";
     string input;
     getline(cin, input);
 
     unordered_map<int, Pipe*> pipesToEdit;
 
     if (input == "all") {
-        pipesToEdit = foundPipes;
+        for (auto& pair : pipes) {
+            pipesToEdit[pair.first] = &pair.second;
+        }
     }
     else {
         stringstream ss(input);
@@ -529,53 +549,55 @@ void PipelineSystem::batchEditPipes() {
             Pipe* pipe = findPipeById(id);
             if (pipe) {
                 pipesToEdit[id] = pipe;   
+            } else {
+                cout << "РўСЂСѓР±Р° СЃ ID " << id << " РЅРµ РЅР°Р№РґРµРЅР°!" << endl;
             }
         }
     }
 
     if (pipesToEdit.empty()) {
-        cout << "Не выбрано ни одной трубы для редактирования." << endl;
+        cout << "РќРµ РІС‹Р±СЂР°РЅРѕ РЅРё РѕРґРЅРѕР№ С‚СЂСѓР±С‹ РґР»СЏ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ." << endl;
         return;
     }
 
-    cout << "\nВыбрано труб для редактирования: " << pipesToEdit.size() << endl;
+    cout << "\nР’С‹Р±СЂР°РЅРѕ С‚СЂСѓР± РґР»СЏ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ: " << pipesToEdit.size() << endl;
 
-    cout << "\nВыберите действие:" << endl;
-    cout << "1. Изменить статус ремонта" << endl;
-    cout << "2. Удалить выбранные трубы" << endl;
-    cout << "0. Отмена" << endl;
+    cout << "\nР’С‹Р±РµСЂРёС‚Рµ РґРµР№СЃС‚РІРёРµ:" << endl;
+    cout << "1. РР·РјРµРЅРёС‚СЊ СЃС‚Р°С‚СѓСЃ СЂРµРјРѕРЅС‚Р°" << endl;
+    cout << "2. РЈРґР°Р»РёС‚СЊ РІС‹Р±СЂР°РЅРЅС‹Рµ С‚СЂСѓР±С‹" << endl;
+    cout << "0. РћС‚РјРµРЅР°" << endl;
 
-    int action = inputInt("Ваш выбор: ", 0, 2);
+    int action = inputInt("Р’Р°С€ РІС‹Р±РѕСЂ: ", 0, 2);
 
     switch (action) {
     case 1: {
-        bool newStatus = inputInt("Новый статус (1-в ремонте, 0-работает): ", 0, 1) == 1;
+        bool newStatus = inputInt("РќРѕРІС‹Р№ СЃС‚Р°С‚СѓСЃ (1-РІ СЂРµРјРѕРЅС‚Рµ, 0-СЂР°Р±РѕС‚Р°РµС‚): ", 0, 1) == 1;
         for (auto& pair : pipesToEdit) {  
             pair.second->setRepairStatus(newStatus);
         }
-        logger.log("Пакетное изменение статуса труб: " + to_string(pipesToEdit.size()) + " объектов");
-        cout << "Статус " << pipesToEdit.size() << " труб изменен!" << endl;
+        logger.log("РџР°РєРµС‚РЅРѕРµ РёР·РјРµРЅРµРЅРёРµ СЃС‚Р°С‚СѓСЃР° С‚СЂСѓР±: " + to_string(pipesToEdit.size()) + " РѕР±СЉРµРєС‚РѕРІ");
+        cout << "РЎС‚Р°С‚СѓСЃ " << pipesToEdit.size() << " С‚СЂСѓР± РёР·РјРµРЅРµРЅ!" << endl;
         break;
     }
     case 2: {
         for (auto& pair : pipesToEdit) {
             pipes.erase(pair.first);   
         }
-        logger.log("Пакетное удаление труб: " + to_string(pipesToEdit.size()) + " объектов");
-        cout << "Удалено " << pipesToEdit.size() << " труб!" << endl;
+        logger.log("РџР°РєРµС‚РЅРѕРµ СѓРґР°Р»РµРЅРёРµ С‚СЂСѓР±: " + to_string(pipesToEdit.size()) + " РѕР±СЉРµРєС‚РѕРІ");
+        cout << "РЈРґР°Р»РµРЅРѕ " << pipesToEdit.size() << " С‚СЂСѓР±!" << endl;
         break;
     }
     case 0:
-        cout << "Операция отменена." << endl;
+        cout << "РћРїРµСЂР°С†РёСЏ РѕС‚РјРµРЅРµРЅР°." << endl;
         break;
     }
 }
 
 void PipelineSystem::connectObjects() {
-    cout << "\n=== СОЕДИНЕНИЕ КОМПРЕССОРНЫХ СТАНЦИЙ ===" << endl;
+    cout << "\n=== РЎРћР•Р”РРќР•РќРР• РљРћРњРџР Р•РЎРЎРћР РќР«РҐ РЎРўРђРќР¦РР™ ===" << endl;
 
     if (stations.size() < 2) {
-        cout << "Для соединения нужно хотя бы 2 КС!" << endl;
+        cout << "Р”Р»СЏ СЃРѕРµРґРёРЅРµРЅРёСЏ РЅСѓР¶РЅРѕ С…РѕС‚СЏ Р±С‹ 2 РљРЎ!" << endl;
         return;
     }
 
@@ -583,38 +605,49 @@ void PipelineSystem::connectObjects() {
 
     int startId, endId, diameter;
 
-    startId = inputInt("Введите ID КС входа: ", 1, nextCSId - 1);
-    endId = inputInt("Введите ID КС выхода: ", 1, nextCSId - 1);
+    startId = inputInt("Р’РІРµРґРёС‚Рµ ID РљРЎ РІС…РѕРґР°: ", 1, nextCSId - 1);
+    endId = inputInt("Р’РІРµРґРёС‚Рµ ID РљРЎ РІС‹С…РѕРґР°: ", 1, nextCSId - 1);
 
     if (startId == endId) {
-        cout << "Ошибка: нельзя соединить КС саму с собой!" << endl;
+        cout << "РћС€РёР±РєР°: РЅРµР»СЊР·СЏ СЃРѕРµРґРёРЅРёС‚СЊ РљРЎ СЃР°РјСѓ СЃ СЃРѕР±РѕР№!" << endl;
         return;
     }
 
-    cout << "Допустимые диаметры: 500, 700, 1000, 1400 мм" << endl;
-    diameter = inputInt("Введите диаметр трубы: ", 500, 1400);
+    cout << "\nР’С‹Р±РµСЂРёС‚Рµ РґРёР°РјРµС‚СЂ С‚СЂСѓР±С‹:" << endl;
+    cout << "1. 500 РјРј" << endl;
+    cout << "2. 700 РјРј" << endl;
+    cout << "3. 1000 РјРј" << endl;
+    cout << "4. 1400 РјРј" << endl;
 
-    if (gasNetwork->connectStations(startId, endId, diameter)) {
-        cout << "Соединение успешно создано!" << endl;
-        logger.log("Создано соединение: КС" + to_string(startId) + " -> КС" + to_string(endId) +
-            " через трубу диаметром " + to_string(diameter) + " мм");
+    int choice = inputInt("Р’Р°С€ РІС‹Р±РѕСЂ (1-4): ", 1, 4);
+
+    switch (choice) {
+    case 1: diameter = 500; break;
+    case 2: diameter = 700; break;
+    case 3: diameter = 1000; break;
+    case 4: diameter = 1400; break;
+    }
+
+    if (gasNetwork->connectOrCreatePipe(startId, endId, diameter, pipes, nextPipeId)) {
+        cout << "РЎРѕРµРґРёРЅРµРЅРёРµ СѓСЃРїРµС€РЅРѕ СЃРѕР·РґР°РЅРѕ!" << endl;
+        logger.log("РЎРѕР·РґР°РЅРѕ СЃРѕРµРґРёРЅРµРЅРёРµ: РљРЎ" + to_string(startId) + " -> РљРЎ" + to_string(endId));
     }
 }
 
 void PipelineSystem::disconnectObjects() {
-    cout << "\n=== РАЗРЫВ СОЕДИНЕНИЯ ===" << endl;
+    cout << "\n=== Р РђР—Р Р«Р’ РЎРћР•Р”РРќР•РќРРЇ ===" << endl;
 
     if (pipes.empty()) {
-        cout << "Нет труб." << endl;
+        cout << "РќРµС‚ С‚СЂСѓР±." << endl;
         return;
     }
 
     showAllPipes();
-    int pipeId = inputInt("Введите ID трубы для разрыва соединения: ", 1, nextPipeId - 1);
+    int pipeId = inputInt("Р’РІРµРґРёС‚Рµ ID С‚СЂСѓР±С‹ РґР»СЏ СЂР°Р·СЂС‹РІР° СЃРѕРµРґРёРЅРµРЅРёСЏ: ", 1, nextPipeId - 1);
 
     if (gasNetwork->disconnectPipe(pipeId)) {
-        cout << "Соединение разорвано." << endl;
-        logger.log("Разорвано соединение для трубы ID: " + to_string(pipeId));
+        cout << "РЎРѕРµРґРёРЅРµРЅРёРµ СЂР°Р·РѕСЂРІР°РЅРѕ." << endl;
+        logger.log("Р Р°Р·РѕСЂРІР°РЅРѕ СЃРѕРµРґРёРЅРµРЅРёРµ РґР»СЏ С‚СЂСѓР±С‹ ID: " + to_string(pipeId));
     }
 }
 
@@ -626,28 +659,28 @@ void PipelineSystem::showTopologicalSort() {
     vector<int> sorted = gasNetwork->topologicalSort();
 
     if (sorted.empty()) {
-        cout << "Топологическая сортировка невозможна." << endl;
+        cout << "РўРѕРїРѕР»РѕРіРёС‡РµСЃРєР°СЏ СЃРѕСЂС‚РёСЂРѕРІРєР° РЅРµРІРѕР·РјРѕР¶РЅР°." << endl;
     }
     else {
-        cout << "\n=== ТОПОЛОГИЧЕСКАЯ СОРТИРОВКА ===" << endl;
-        cout << "Порядок обработки КС: ";
+        cout << "\n=== РўРћРџРћР›РћР“РР§Р•РЎРљРђРЇ РЎРћР РўРР РћР’РљРђ ===" << endl;
+        cout << "РџРѕСЂСЏРґРѕРє РѕР±СЂР°Р±РѕС‚РєРё РљРЎ: ";
         for (size_t i = 0; i < sorted.size(); ++i) {
-            cout << "КС" << sorted[i];
+            cout << "РљРЎ" << sorted[i];
             if (i < sorted.size() - 1) {
                 cout << " -> ";
             }
         }
         cout << endl;
-        logger.log("Выполнена топологическая сортировка.");
+        logger.log("Р’С‹РїРѕР»РЅРµРЅР° С‚РѕРїРѕР»РѕРіРёС‡РµСЃРєР°СЏ СЃРѕСЂС‚РёСЂРѕРІРєР°.");
     }
 }
 
 void PipelineSystem::saveToFile() {
-    string filename = inputString("Введите имя файла для сохранения: ");
+    string filename = inputString("Р’РІРµРґРёС‚Рµ РёРјСЏ С„Р°Р№Р»Р° РґР»СЏ СЃРѕС…СЂР°РЅРµРЅРёСЏ: ");
     ofstream file(filename);
 
     if (!file.is_open()) {
-        cout << "Ошибка создания файла!" << endl;
+        cout << "РћС€РёР±РєР° СЃРѕР·РґР°РЅРёСЏ С„Р°Р№Р»Р°!" << endl;
         return;
     }
 
@@ -678,16 +711,16 @@ void PipelineSystem::saveToFile() {
     }
 
     file.close();
-    logger.log("Сохранение данных в файл: " + filename);
-    cout << "Данные сохранены в файл: " << filename << endl;
+    logger.log("РЎРѕС…СЂР°РЅРµРЅРёРµ РґР°РЅРЅС‹С… РІ С„Р°Р№Р»: " + filename);
+    cout << "Р”Р°РЅРЅС‹Рµ СЃРѕС…СЂР°РЅРµРЅС‹ РІ С„Р°Р№Р»: " << filename << endl;
 }
 
 void PipelineSystem::loadFromFile() {
-    string filename = inputString("Введите имя файла для загрузки: ");
+    string filename = inputString("Р’РІРµРґРёС‚Рµ РёРјСЏ С„Р°Р№Р»Р° РґР»СЏ Р·Р°РіСЂСѓР·РєРё: ");
     ifstream file(filename);
 
     if (!file.is_open()) {
-        cout << "Ошибка открытия файла!" << endl;
+        cout << "РћС€РёР±РєР° РѕС‚РєСЂС‹С‚РёСЏ С„Р°Р№Р»Р°!" << endl;
         return;
     }
 
@@ -775,8 +808,8 @@ void PipelineSystem::loadFromFile() {
         delete gasNetwork;
         gasNetwork = new GasNetwork(pipes, stations);
 
-        logger.log("Загрузка данных из файла: " + filename);
-        cout << "Данные загружены из файла: " << filename << endl;
+        logger.log("Р—Р°РіСЂСѓР·РєР° РґР°РЅРЅС‹С… РёР· С„Р°Р№Р»Р°: " + filename);
+        cout << "Р”Р°РЅРЅС‹Рµ Р·Р°РіСЂСѓР¶РµРЅС‹ РёР· С„Р°Р№Р»Р°: " << filename << endl;
 
     }
     catch (...) {
@@ -784,6 +817,6 @@ void PipelineSystem::loadFromFile() {
         stations = backupStations;
         nextPipeId = backupNextPipeId;
         nextCSId = backupNextCSId;
-        cout << "Ошибка загрузки файла! Данные восстановлены." << endl;
+        cout << "РћС€РёР±РєР° Р·Р°РіСЂСѓР·РєРё С„Р°Р№Р»Р°! Р”Р°РЅРЅС‹Рµ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅС‹." << endl;
     }
 }

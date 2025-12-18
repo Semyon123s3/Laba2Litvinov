@@ -123,6 +123,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Constants.cpp" />
     <ClCompile Include="CS.cpp" />
     <ClCompile Include="GasNetwork.cpp" />
     <ClCompile Include="Logger.cpp" />
@@ -131,6 +132,7 @@
     <ClCompile Include="PipelineSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Constants.h" />
     <ClInclude Include="CS.h" />
     <ClInclude Include="GasNetwork.h" />
     <ClInclude Include="Logger.h" />

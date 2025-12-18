@@ -1,6 +1,7 @@
 #include "GasNetwork.h"
 #include <iostream>
 #include <algorithm>
+#include "Constants.h"
 using namespace std;
 
 GasNetwork::GasNetwork(unordered_map<int, Pipe>& p, unordered_map<int, CS>& s)
@@ -189,3 +190,48 @@ void GasNetwork::showNetwork() const {
         cout << "Нет соединений." << endl;
     }
 }
+
+bool GasNetwork::connectOrCreatePipe(int startId, int endId, int diameter,
+    unordered_map<int, Pipe>& pipes, int& nextPipeId) {
+    if (stations.find(startId) == stations.end() ||
+        stations.find(endId) == stations.end()) {
+        cout << "Ошибка: одна из КС не найдена!" << endl;
+        return false;
+    }
+
+    if (startId == endId) {
+        cout << "Ошибка: нельзя соединить КС саму с собой!" << endl;
+        return false;
+    }
+
+    int pipeId = findAvailablePipe(diameter);
+
+    if (pipeId == -1) {
+        cout << "\n--- СОЗДАНИЕ НОВОЙ ТРУБЫ ---" << endl;
+        cout << "Нет свободных труб диаметром " << diameter << " мм." << endl;
+
+        pipeId = nextPipeId++;
+
+        cout << "Введите параметры для новой трубы:" << endl;
+
+        Pipe newPipe(pipeId);
+        newPipe.setDiameter(diameter);
+        newPipe.setLength(10.0);  
+        newPipe.setName("Труба для соединения КС" + to_string(startId) + "-КС" + to_string(endId));
+
+        pipes[pipeId] = newPipe;
+        cout << "Создана новая труба ID: " << pipeId << endl;
+    }
+
+    Pipe& pipe = pipes[pipeId];
+    pipe.connect(startId, endId);
+
+    cout << "Соединение: КС" << startId << " -> КС" << endId
+        << " через трубу ID " << pipeId << " (диаметр: " << diameter << " мм)" << endl;
+
+    updateGraph();
+    return true;
+}
+
+
+

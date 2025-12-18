@@ -104,31 +104,43 @@ void PipelineSystem::addPipe() {
 
     newPipe.setName(inputString("Введите километровую отметку (название): "));
     newPipe.setLength(inputDouble("Введите длину трубы (км): ", 0.1, 10000.0));
-    newPipe.setDiameter(inputInt("Введите диаметр трубы (мм): ", 1, 5000));
+
+    cout << "\nДопустимые диаметры труб:\n";
+    cout << "==========================\n";
+    for (const auto& pair : PIPE_DIAMETERS_CAPACITY) {
+        cout << "  " << pair.first << " мм -> " << pair.second << " млн м³/день\n";
+    }
+    cout << "==========================\n";
+
+    int diameter;
+    bool valid = false;
+    while (!valid) {
+        diameter = inputInt("Выберите диаметр из списка выше (мм): ", 1, 5000);
+        if (PIPE_DIAMETERS_CAPACITY.find(diameter) != PIPE_DIAMETERS_CAPACITY.end()) {
+            valid = true;
+        }
+        else {
+            cout << "Ошибка! Диаметр " << diameter << " мм не поддерживается.\n";
+            cout << "Допустимые диаметры: ";
+            for (const auto& pair : PIPE_DIAMETERS_CAPACITY) {
+                cout << pair.first << " ";
+            }
+            cout << "мм\n";
+        }
+    }
+
+    newPipe.setDiameter(diameter);
+
 
     int repairStatus = inputInt("В ремонте (1-да, 0-нет): ", 0, 1);
     newPipe.setRepairStatus(repairStatus == 1);
 
     pipes[newPipe.getId()] = newPipe;
-    logger.log("Добавлена труба ID: " + to_string(newPipe.getId()) + ", название: " + newPipe.getName());
-    cout << "Труба успешно добавлена! ID: " << newPipe.getId() << endl;
+    logger.log("Добавлена труба ID: " + to_string(newPipe.getId()) +
+        ", название: " + newPipe.getName() +
+        ", диаметр: " + to_string(diameter) + " мм");
 
-    cout << "\nДопустимые диаметры труб:\n";
-    for (const auto& pair : PIPE_DIAMETERS_CAPACITY) {
-        cout << pair.first << " мм -> " << pair.second << " млн м³/день\n";
-    }
-
-    int diameter;
-    bool valid = false;
-    while (!valid) {
-        diameter = inputInt("Выберите диаметр из списка: ", 1, 5000);
-        if (PIPE_DIAMETERS_CAPACITY.find(diameter) != PIPE_DIAMETERS_CAPACITY.end()) {
-            valid = true;
-        }
-        else {
-            cout << "Неверный диаметр! Выберите из списка.\n";
-        }
-    }
+    cout << "\n✓ Труба успешно добавлена!" << endl;
 }
 
 void PipelineSystem::addCS() {
@@ -627,24 +639,30 @@ void PipelineSystem::connectObjects() {
         return;
     }
 
-    cout << "\nВыберите диаметр трубы:" << endl;
-    cout << "1. 500 мм" << endl;
-    cout << "2. 700 мм" << endl;
-    cout << "3. 1000 мм" << endl;
-    cout << "4. 1400 мм" << endl;
+    cout << "\nДопустимые диаметры труб:\n";
+    cout << "==========================\n";
 
-    int choice = inputInt("Ваш выбор (1-4): ", 1, 4);
+    int index = 1;
+    unordered_map<int, int> menuToDiameter; 
 
-    switch (choice) {
-    case 1: diameter = 500; break;
-    case 2: diameter = 700; break;
-    case 3: diameter = 1000; break;
-    case 4: diameter = 1400; break;
+    for (const auto& pair : PIPE_DIAMETERS_CAPACITY) {
+        cout << index << ". " << pair.first << " мм (пропускная способность: "
+            << pair.second << " млн м³/день)\n";
+        menuToDiameter[index] = pair.first;
+        index++;
     }
+    cout << "==========================\n";
+
+    int choice = inputInt("Выберите диаметр трубы (1-" +
+        to_string(PIPE_DIAMETERS_CAPACITY.size()) + "): ",
+        1, PIPE_DIAMETERS_CAPACITY.size());
+
+    diameter = menuToDiameter[choice];
 
     if (gasNetwork->connectOrCreatePipe(startId, endId, diameter, pipes, nextPipeId)) {
         cout << "Соединение успешно создано!" << endl;
-        logger.log("Создано соединение: КС" + to_string(startId) + " -> КС" + to_string(endId));
+        logger.log("Создано соединение: КС" + to_string(startId) + " -> КС" + to_string(endId) +
+            " через трубу диаметром " + to_string(diameter) + " мм");
     }
 }
 
@@ -833,4 +851,6 @@ void PipelineSystem::loadFromFile() {
         nextCSId = backupNextCSId;
         cout << "Ошибка загрузки файла! Данные восстановлены." << endl;
     }
+
+
 }
